@@ -1,1 +1,1 @@
-# ActiveLearningForConnectomics
+# Active Learning For Connectomics
