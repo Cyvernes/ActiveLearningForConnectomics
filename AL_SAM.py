@@ -11,15 +11,18 @@ import random
 import matplotlib.pyplot as plt
 from Learners import *
 from tools import *
+from plot_tools import *
 
 SUBSET_SIZE = 1
 TRAIN_RATIO = 1
 LOAD_DATA_ONCE_FOR_ALL = True
 CHOOSE_DATA_AT_RANDOM = False
+LEARNER_TYPE = "Basic" # {"Basic", "FPFN", "MaxUncertainty", "DistTransform", "UncertaintyPath"}
+
 SAVE_INTERMEDIATE_RESULTS = True
 SAVE_IMAGE_WITH_GT = True
 SAVE_FIRST_SEED = True
-LEARNER_TYPE = "Basic" # {"Basic", "FPFN", "MaxUncertainty", "DistTransform", "UncertaintyPath"}
+SAVE_FINAL_IOU_EVOLUTION = True
 
 FILE_WITH_ALL_LINKS = "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
 FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/temp/pred_evol/"
@@ -61,7 +64,7 @@ if __name__ == "__main__":
         masks_links  = [dataset_links['masks'][idx]  for idx in subset_idx]
         del subset_idx
     else:
-        images_links = SPECIFIC_IMAGE_LINKS
+        images_links =  SPECIFIC_IMAGE_LINKS
         masks_links  =  SPECIFIC_MASK_LINKS
     
     print("There is" if len(images_links) == 1 else "There are", len(images_links),"selected images.")
@@ -85,14 +88,13 @@ if __name__ == "__main__":
     sam = sam_model_registry[model_type](checkpoint = sam_checkpoint)
     sam.to(device = device)
 
-    
     """
     Training
     """
     print('-------------------------------------')
     print("Training...")
     
-    #instancing a learning algorithm
+    #Instancing a learning algorithm
     if LEARNER_TYPE == "Basic":
         learner = ActiveLearningSAM(sam)
     elif LEARNER_TYPE == "FPFN":
@@ -108,7 +110,7 @@ if __name__ == "__main__":
     
     for idx in range(int(TRAIN_RATIO*len(images_links))):
         print('-------------------------------------', idx + 1, '/', int(TRAIN_RATIO*len(images_links)))
-        #load data
+        #Load image and ground truth mask
         if LOAD_DATA_ONCE_FOR_ALL:
             image = train_images[idx]
             GT_mask = train_masks[idx]
@@ -116,37 +118,24 @@ if __name__ == "__main__":
             image = cv2.imread(images_links[idx])
             GT_mask = np.any(cv2.imread(masks_links[idx]) != [0,0,0], axis = -1)
 
-        
         if SAVE_IMAGE_WITH_GT:
-            imagewGT = image.copy()
-            imagewGT[GT_mask] = 0.7*image[GT_mask] + 0.3*np.array([75, 0, 125])
-            plt.imshow(imagewGT)
-            plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Image n°{idx} with GT.png"))
-            plt.clf()
+            plotAndSaveImageWithGT(image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
 
-        #print("Ground truth mask shape:", np.shape(GT_mask))
+        #Give image and GTmask to the learner
         learner.setData(image)
         if learner.needGroundTruth:
             learner.setGroundTruthMask(GT_mask)
         
-        #Find the first point to query
+        #Find the first seed to query
         first_seed, nb_seeds, first_mask = learner.findFirstSeed()
         if len(first_seed) == 0:#avoid empty list
             print("No first seed was given")
             continue
         
-
         if SAVE_FIRST_SEED:
-            imagewsem = image.copy()
-            imagewsem[first_mask] = 0.7*image[first_mask] + 0.3*np.array([75, 0, 125])
-            plt.imshow(imagewsem)
-            plt.title('First seed from this mask (from segment everything)')
-            plt.scatter([first_seed[0]], [first_seed[1]])
-            plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Image n°{idx} with first seed.png"))
-            plt.clf()
+            plotAndSaveImageWithFirstSeed(image, first_mask, first_seed, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
 
-        
-        # Main loop
+        #Main loop
         input_points = []
         input_labels = []
         IoUs = []
@@ -157,58 +146,22 @@ if __name__ == "__main__":
         for i in range(nb_seeds):
             input_points.append(new_seed)
             input_labels.append(getLabel(new_seed, GT_mask))
-            
+    
             if getLabel(new_seed, GT_mask):
                 look_for_first_GT_mitochondria = False
-            
             learner.learn(input_points, input_labels)
-
             new_seed = learner.findNewSeed()
-               
+            
+            #Save results
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
             FPs.append(FP(learner.cp_mask, GT_mask)) 
             FNs.append(FN(learner.cp_mask, GT_mask)) 
-            #draw i-th prediction
-            if SAVE_INTERMEDIATE_RESULTS:
-                cp_mask = learner.cp_mask
-                fig, axs = plt.subplots(2, 3, layout = 'constrained')
-                fig.set_figheight(15)
-                fig.set_figwidth(23)
-                
-                prediction_i = image.copy()
-                prediction_i[cp_mask] = 0.7*image[cp_mask] + 0.3*np.array([75, 0, 125])
-                axs[0, 0].imshow(prediction_i)
-                axs[0, 0].scatter([new_seed[0]], [new_seed[1]], color = "green" if getLabel(new_seed, GT_mask) else "red")
-                axs[0, 0].set_title("Image with mask and new seed", fontsize = 25)
+            
+            if SAVE_INTERMEDIATE_RESULTS:#draw i-th prediction
+                plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i, idx)
 
-                im1 = axs[0, 1].imshow(learner.evidence)
-                axs[0, 1].set_title("Evidence", fontsize = 25)
-
-                uncertainty = uncertaintyH(learner.evidence)
-                im2 = axs[0, 2].imshow(uncertainty)
-                axs[0, 2].set_title("Uncertainty", fontsize = 25)
-                
-                axs[1, 0].plot(IoUs)
-                axs[1, 0].set_title("IoU",  fontsize = 25)
-                
-                axs[1, 1].plot(FPs)
-                axs[1, 1].set_title("FP", fontsize = 25)
-                
-                axs[1, 2].plot(FNs)
-                axs[1, 2].set_title("FN", fontsize = 25)
-                
-                fig.colorbar(im1, ax = axs[0, 1], location = "right",  shrink = 1)
-                fig.colorbar(im2, ax = axs[0, 2], location = "right",  shrink = 1)
-                
-                fig.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Results n° {i} of image n°{idx}.png"))
-                plt.close(fig)
-
-
-        plt.plot(list(range(1,len(IoUs) + 1 )), IoUs)
-        plt.xlabel("Nb of seeds")
-        plt.ylabel('IoU')
-        plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f'IoU_{idx}.png'))
-        plt.clf()
+        if SAVE_FINAL_IOU_EVOLUTION:
+            plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
         
         """
         Testing
