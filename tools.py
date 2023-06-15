@@ -77,14 +77,12 @@ def findNewSeedWithUncertaintyPathDist(evidence : np.array, thresh : float):
         if seen_points[point[0], point[1]] == 0:
             distances[point[0], point[1]] = weight
             seen_points[point[0], point[1]] = 1
-        else:
-            continue
-        for dx, dy in [(1, 1), (1, 0), (1, -1), (0, 1), (0, -1), (-1, 1), (-1, 0), (-1, -1)]:
-            if (0 <= point[0] + dx < h) and (0 <= point[1] + dy < w) and (uncertain_mask[point[0] + dx, point[1] + dy] and seen_points[point[0] + dx, point[1] + dy] == 0):
-                potential_weight = np.sqrt(np.abs(dx) + np.abs(dy)) * uncertainty[point[0] + dx, point[1] + dy] + distances[point[0], point[1]]
-                if distances[point[0] + dx, point[1] + dy] == 0 or potential_weight < distances[point[0] + dx, point[1] + dy]:#tiny optimization
-                    distances[point[0] + dx, point[1] + dy] = potential_weight
-                    heapq.heappush(points_to_see, (potential_weight, (point[0] + dx, point[1] + dy)))
+            for dx, dy in [(1, 1), (1, 0), (1, -1), (0, 1), (0, -1), (-1, 1), (-1, 0), (-1, -1)]:
+                if (0 <= point[0] + dx < h) and (0 <= point[1] + dy < w) and (uncertain_mask[point[0] + dx, point[1] + dy] and seen_points[point[0] + dx, point[1] + dy] == 0):
+                    potential_weight = np.sqrt(np.abs(dx) + np.abs(dy)) * uncertainty[point[0] + dx, point[1] + dy] + distances[point[0], point[1]]
+                    if distances[point[0] + dx, point[1] + dy] == 0 or potential_weight < distances[point[0] + dx, point[1] + dy]:#tiny optimization
+                        distances[point[0] + dx, point[1] + dy] = potential_weight
+                        heapq.heappush(points_to_see, (potential_weight, (point[0] + dx, point[1] + dy)))
     
     
     return(np.unravel_index(np.argmax(distances), distances.shape))

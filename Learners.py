@@ -44,11 +44,12 @@ class ActiveLearningSAM:
     
     def findFirstSeed(self):#masks from Segment Everything are in the same format as the image
         SE_masks = sorted(self.mask_generator.generate(self.image), key = lambda mask: mask['predicted_iou'])#masks from segement every thing
+        nb_seeds = len(SE_masks)
         SE_mask = SE_masks.pop(-1)['segmentation'] 
         first_seed = swap(findVisualCenter(SE_mask))
         self.SE_Seeds = [swap(findVisualCenter(mask['segmentation'])) for mask in SE_masks]#SE_seeds are saved in the evidence format
         self.cp_mask = SE_mask
-        return(first_seed, len(self.SE_Seeds), SE_mask)
+        return(first_seed, nb_seeds, SE_mask)
     
     def learn(self, input_points, input_labels):
         if input_labels[-1]:

@@ -150,7 +150,9 @@ if __name__ == "__main__":
             if getLabel(new_seed, GT_mask):
                 look_for_first_GT_mitochondria = False
             learner.learn(input_points, input_labels)
-            new_seed = learner.findNewSeed()
+            
+            if i != nb_seeds -1:
+                new_seed = learner.findNewSeed()
             
             #Save results
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
@@ -158,7 +160,8 @@ if __name__ == "__main__":
             FNs.append(FN(learner.cp_mask, GT_mask)) 
             
             if SAVE_INTERMEDIATE_RESULTS:#draw i-th prediction
-                plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i, idx)
+                plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i, idx, nb_seeds)
+
 
         if SAVE_FINAL_IOU_EVOLUTION:
             plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)

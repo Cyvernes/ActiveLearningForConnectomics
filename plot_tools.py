@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 from tools import *
 
-def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i : int, idx : int):
+def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i : int, idx : int, nb_seeds):
     title_fontsize = 25
     xtick_fontsize = 20
     ytick_fontsize = 20
@@ -17,8 +17,11 @@ def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR
     prediction_i = image.copy()
     prediction_i[cp_mask] = 0.7*image[cp_mask] + 0.3*np.array([75, 0, 125])
     axes[0, 0].imshow(prediction_i)
-    axes[0, 0].scatter([new_seed[0]], [new_seed[1]], color = "green" if getLabel(new_seed, GT_mask) else "red", s = new_seed_s)
-    axes[0, 0].set_title("Image with mask and new seed", fontsize = title_fontsize)
+    if i != nb_seeds - 1:
+        axes[0, 0].scatter([new_seed[0]], [new_seed[1]], color = "green" if getLabel(new_seed, GT_mask) else "red", s = new_seed_s)
+        axes[0, 0].set_title("Image with mask and new seed", fontsize = title_fontsize)
+    else:
+        axes[0, 0].set_title("Image with final mask", fontsize = title_fontsize)
     axes[0, 0].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[0, 0].tick_params(axis = "y", labelsize = ytick_fontsize) 
 
