@@ -1,9 +1,9 @@
-
+import numpy as np
 import matplotlib.pyplot as plt
 import os
 from tools import *
 
-def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i : int, idx : int, nb_seeds):
+def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, folder, IoUs, FNs, FPs, i : int, idx : int, nb_seeds):
     title_fontsize = 25
     xtick_fontsize = 20
     ytick_fontsize = 20
@@ -30,7 +30,7 @@ def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR
     axes[0, 1].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[0, 1].tick_params(axis = "y", labelsize = ytick_fontsize) 
 
-    uncertainty = uncertaintyH(learner.evidence)
+    uncertainty = learner.uncertainty_function(learner.evidence)
     im2 = axes[0, 2].imshow(uncertainty)
     axes[0, 2].set_title("Uncertainty", fontsize = title_fontsize)
     axes[0, 2].tick_params(axis = "x", labelsize = xtick_fontsize) 
@@ -54,30 +54,48 @@ def plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR
     fig.colorbar(im1, ax = axes[0, 1], location = "right",  shrink = 1)
     fig.colorbar(im2, ax = axes[0, 2], location = "right",  shrink = 1)
                 
-    fig.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Results n° {i} of image n°{idx}.png"))
+    fig.savefig(os.path.join(folder, f"Results n° {i} of image n°{idx}.png"))
     plt.close(fig)
 
 
-def plotAndSaveImageWithFirstSeed(image, first_mask, first_seed, FOLDER_FOR_INTERMEDIATE_RESULTS, idx : int):
+def plotAndSaveImageWithFirstSeed(image, first_mask, first_seed, folder, idx : int):
     imagewsem = image.copy()
     imagewsem[first_mask] = 0.7*image[first_mask] + 0.3*np.array([75, 0, 125])
     plt.imshow(imagewsem)
     plt.title('First seed from this mask (from segment everything)')
     plt.scatter([first_seed[0]], [first_seed[1]])
-    plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Image n°{idx} with first seed.png"))
+    plt.savefig(os.path.join(folder, f"Image n°{idx} with first seed.png"))
     plt.clf()
 
-def plotAndSaveImageWithGT(image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, idx : int):
+def plotAndSaveImageWithGT(image, GT_mask, folder, idx : int):
     imagewGT = image.copy()
     imagewGT[GT_mask] = 0.7*image[GT_mask] + 0.3*np.array([75, 0, 125])
     plt.imshow(imagewGT)
     plt.title(f"Image n°{idx} with GT")
-    plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f"Image n°{idx} with GT.png"))
+    plt.savefig(os.path.join(folder, f"Image n°{idx} with GT.png"))
     plt.clf()
     
-def plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_INTERMEDIATE_RESULTS, idx : int):
+def plotAndSaveFinalIoUEvolution(IoUs, folder, idx : int):
     plt.plot(list(range(1,len(IoUs) + 1 )), IoUs)
     plt.xlabel("Nb of seeds")
     plt.ylabel('IoU')
-    plt.savefig(os.path.join(FOLDER_FOR_INTERMEDIATE_RESULTS, f'IoU_{idx}.png'))
+    plt.savefig(os.path.join(folder, f'IoU_{idx}.png'))
+    plt.clf()
+
+def savePercentiles(learner, percentiles_points, percentiles):
+    uncertainty = learner.uncertainty_function(learner.evidence)
+    for i,p in enumerate(percentiles_points):
+        percentiles[i].append(np.percentile(uncertainty, p))
+        
+
+def savePercentilesPlot(folder, percentiles, idx : int):
+    for i,history in enumerate(percentiles):
+        plt.plot(history)
+    plt.savefig(os.path.join(folder, f"Uncertainty percentiles evolution n°{idx}.png"))
+    plt.clf()
+    
+
+def plotAndSave(arr : np.array, name):
+    plt.imshow(arr)
+    plt.savefig(name)
     plt.clf()
