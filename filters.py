@@ -1,5 +1,6 @@
 import numpy as np
 from tools import *
+from plot_tools import *
 
 
 def filterTrivial(arr: np.ndarray, evidence = None) -> np.ndarray:
@@ -14,6 +15,7 @@ def filterWithDist(arr : np.ndarray, evidence : np.ndarray) -> np.ndarray:
     blob[evidence > min_evidence_thresh] = 0
     blob = blob.astype("uint8")
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
+    print('------------')
     arr = np.multiply(arr, sigmoid(dist - np.max(dist)/3))
     return(arr)
 

@@ -12,20 +12,31 @@ import matplotlib.pyplot as plt
 from Learners import *
 from tools import *
 from plot_tools import *
+from filters import *
 
 SUBSET_SIZE = 1
 TRAIN_RATIO = 1
 LOAD_DATA_ONCE_FOR_ALL = True
 CHOOSE_DATA_AT_RANDOM = False
-LEARNER_TYPE = "Basic" # {"Basic", "FPFN", "MaxUncertainty", "DistTransform", "UncertaintyPath"}
+
+LEARNER_TYPE = "FPFN" #{"Active Learning", "FPFN", "Random"}
+STRATEGY_SELECTOR = changeAfterAGivenAmountOfSeed
+SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxUncertainty] #{ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist}
+UNCERTAINTY_FUNCTION_TYPE = uncertaintyH #{uncertaintyH, uncertaintyKL}
+FILTERING_FUNCTION = filterWithDist #{filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton}
+USE_PREVIOUS_LOGITS = True
+USE_BUDGET = False
+ANNOTATION_BUDGET = 20
 
 SAVE_INTERMEDIATE_RESULTS = True
 SAVE_IMAGE_WITH_GT = True
 SAVE_FIRST_SEED = True
 SAVE_FINAL_IOU_EVOLUTION = True
+SAVE_UNCERTAINTY_PERCENTILES = True
 
 FILE_WITH_ALL_LINKS = "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
-FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/temp/pred_evol/"
+FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/"
+FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/"
 SPECIFIC_IMAGE_LINKS = [ '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y3072-3584_z1024-1536-LOC-0_254_0-512_0-512.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/images/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/images/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff',
@@ -36,7 +47,6 @@ SPECIFIC_MASK_LINKS =  [ '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/We
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/masks/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/masks/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/masks/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff'      ]
-
 SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[3]]
 SPECIFIC_MASK_LINKS  = [SPECIFIC_MASK_LINKS[3]]
 
@@ -95,16 +105,12 @@ if __name__ == "__main__":
     print("Training...")
     
     #Instancing a learning algorithm
-    if LEARNER_TYPE == "Basic":
-        learner = ActiveLearningSAM(sam)
+    if   LEARNER_TYPE == "Active Learning":
+        learner = ActiveLearningSAM(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     elif LEARNER_TYPE == "FPFN":
-        learner = FPFNLearner(sam)
-    elif LEARNER_TYPE == "MaxUncertainty":
-        learner = MaxUncertaintyLearner(sam)
-    elif LEARNER_TYPE == "DistTransform":
-        learner = DistTransformLearner(sam)
-    elif LEARNER_TYPE == "UncertaintyPath":
-        learner = UncertaintyPathLearner(sam)
+        learner = FPFNLearner(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
+    elif LEARNER_TYPE == "Random":
+        learner = RandomLearner(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     else:
         raise ValueError('Unknown learner type')
     
@@ -121,9 +127,9 @@ if __name__ == "__main__":
         if SAVE_IMAGE_WITH_GT:
             plotAndSaveImageWithGT(image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
 
-        #Give image and GTmask to the learner
+        #Give image and GTmask (if needed) to the learner
         learner.setData(image)
-        if learner.needGroundTruth:
+        if learner.need_ground_truth:
             learner.setGroundTruthMask(GT_mask)
         
         #Find the first seed to query
@@ -136,6 +142,11 @@ if __name__ == "__main__":
             plotAndSaveImageWithFirstSeed(image, first_mask, first_seed, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
 
         #Main loop
+        
+        if SAVE_UNCERTAINTY_PERCENTILES:
+            percentiles_points = list(range(0, 100, 5))
+            percentiles = [[] for i in percentiles_points]
+            
         input_points = []
         input_labels = []
         IoUs = []
@@ -143,17 +154,19 @@ if __name__ == "__main__":
         FNs = []
         new_seed = first_seed.copy()
 
+        if USE_BUDGET:
+            nb_seeds = ANNOTATION_BUDGET
+            
         for i in range(nb_seeds):
+            
             input_points.append(new_seed)
             input_labels.append(getLabel(new_seed, GT_mask))
-    
-            if getLabel(new_seed, GT_mask):
-                look_for_first_GT_mitochondria = False
-            learner.learn(input_points, input_labels)
             
+            learner.learn(input_points, input_labels)
             if i != nb_seeds -1:
                 new_seed = learner.findNewSeed()
-            
+                print(i,new_seed)
+                
             #Save results
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
             FPs.append(FP(learner.cp_mask, GT_mask)) 
@@ -161,11 +174,17 @@ if __name__ == "__main__":
             
             if SAVE_INTERMEDIATE_RESULTS:#draw i-th prediction
                 plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i, idx, nb_seeds)
-
-
-        if SAVE_FINAL_IOU_EVOLUTION:
-            plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
+            
+            if SAVE_UNCERTAINTY_PERCENTILES:
+                savePercentiles(learner, percentiles_points, percentiles)
         
+        if SAVE_UNCERTAINTY_PERCENTILES:
+            savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, percentiles, idx)
+            
+        if SAVE_FINAL_IOU_EVOLUTION:
+            plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_FINAL_RESULTS, idx)
+        
+
         """
         Testing
         """
