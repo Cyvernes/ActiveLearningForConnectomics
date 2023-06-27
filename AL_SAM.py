@@ -125,7 +125,7 @@ if __name__ == "__main__":
             GT_mask = np.any(cv2.imread(masks_links[idx]) != [0,0,0], axis = -1)
 
         if SAVE_IMAGE_WITH_GT:
-            plotAndSaveImageWithGT(image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
+            plotAndSaveImageWithGT(FOLDER_FOR_INTERMEDIATE_RESULTS, image, GT_mask, idx)
 
         #Give image and GTmask (if needed) to the learner
         learner.setData(image)
@@ -139,7 +139,7 @@ if __name__ == "__main__":
             continue
         
         if SAVE_FIRST_SEED:
-            plotAndSaveImageWithFirstSeed(image, first_mask, first_seed, FOLDER_FOR_INTERMEDIATE_RESULTS, idx)
+            plotAndSaveImageWithFirstSeed(FOLDER_FOR_INTERMEDIATE_RESULTS, image, first_mask, first_seed, idx)
 
         #Main loop
         
@@ -153,37 +153,38 @@ if __name__ == "__main__":
         FPs = []
         FNs = []
         new_seeds = [first_seed.copy()]
+        NBS = []
 
         if USE_BUDGET:
             nb_seeds = ANNOTATION_BUDGET
             
         for i in range(nb_seeds):
-            
 
             input_points += new_seeds
             input_labels += [getLabel(new_seed, GT_mask) for new_seed in new_seeds]
             
             learner.learn(input_points, input_labels)
+            NBS.append(NBS[-1] + len(new_seeds) if len(NBS) > 0 else len(new_seeds))
             if i != nb_seeds -1:
                 new_seeds = learner.findNewSeeds()
-                print(i,new_seeds)
                 
             #Save results
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
             FPs.append(FP(learner.cp_mask, GT_mask)) 
             FNs.append(FN(learner.cp_mask, GT_mask)) 
             
+            
             if SAVE_INTERMEDIATE_RESULTS:#draw i-th prediction
-                plotAndSaveIntermediateResults(learner, new_seed, image, GT_mask, FOLDER_FOR_INTERMEDIATE_RESULTS, IoUs, FNs, FPs, i, idx, nb_seeds)
+                plotAndSaveIntermediateResults(FOLDER_FOR_INTERMEDIATE_RESULTS, learner, new_seeds, image, GT_mask, IoUs, FNs, FPs, i, idx, nb_seeds, NBS)
             
             if SAVE_UNCERTAINTY_PERCENTILES:
                 savePercentiles(learner, percentiles_points, percentiles)
         
         if SAVE_UNCERTAINTY_PERCENTILES:
-            savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, percentiles, idx)
+            savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, NBS, percentiles, idx)
             
         if SAVE_FINAL_IOU_EVOLUTION:
-            plotAndSaveFinalIoUEvolution(IoUs, FOLDER_FOR_FINAL_RESULTS, idx)
+            plotAndSaveFinalIoUEvolution(FOLDER_FOR_FINAL_RESULTS, NBS, IoUs, idx)
         
 
         """
