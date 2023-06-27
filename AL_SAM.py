@@ -152,20 +152,21 @@ if __name__ == "__main__":
         IoUs = []
         FPs = []
         FNs = []
-        new_seed = first_seed.copy()
+        new_seeds = [first_seed.copy()]
 
         if USE_BUDGET:
             nb_seeds = ANNOTATION_BUDGET
             
         for i in range(nb_seeds):
             
-            input_points.append(new_seed)
-            input_labels.append(getLabel(new_seed, GT_mask))
+
+            input_points += new_seeds
+            input_labels += [getLabel(new_seed, GT_mask) for new_seed in new_seeds]
             
             learner.learn(input_points, input_labels)
             if i != nb_seeds -1:
-                new_seed = learner.findNewSeed()
-                print(i,new_seed)
+                new_seeds = learner.findNewSeeds()
+                print(i,new_seeds)
                 
             #Save results
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 

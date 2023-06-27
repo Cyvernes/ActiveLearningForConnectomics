@@ -14,11 +14,11 @@ from tools import *
 from plot_tools import *
 from filters import *
 from strategy_selectors import *
-from new_seed_strategies import *
+from new_seeds_strategies import *
 
 
 class ActiveLearningSAM:
-    def __init__(self, model, strategy_selector, seed_selection_strategies, uncertainty_fn, filtering_fn, image=None, mask_generator=None, use_previous_logits=True):
+    def __init__(self, model, strategy_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, image=None, mask_generator=None, use_previous_logits=True):
         self.model = model
         self.image = image
         self.cp_mask = None #Current predicted mask
@@ -40,7 +40,7 @@ class ActiveLearningSAM:
         self.strategy_selector = strategy_selector
         
         #selecting the strategies
-        self.seed_selection_strategies = seed_selection_strategies
+        self.seeds_selection_strategies = seeds_selection_strategies
         
         #Instancing a mask generator
         if mask_generator:
@@ -90,17 +90,17 @@ class ActiveLearningSAM:
         self.cp_mask = self.evidence > self.predictor.model.mask_threshold
         return(self.cp_mask)
     
-    def findNewSeed(self) -> np.ndarray:
+    def findNewSeeds(self) -> list:
         self.strategy_idx = self.strategy_selector(int(self.strategy_idx), self.input_points, self.input_labels)
-        new_seed = self.seed_selection_strategies[self.strategy_idx](self)
-        return(new_seed)
+        new_seeds = self.seeds_selection_strategies[self.strategy_idx](self)
+        return(new_seeds)
 
 class FPFNLearner(ActiveLearningSAM):
     """
     Not really an active learner because new seeds are selected using ground truth
     """
-    def __init__(self, model, strategy_selector, seed_selection_strategies, uncertainty_fn=uncertaintyH, filtering_fn=filterTrivial, image=None, mask_generator=None, use_previous_logits=True, GT_mask = None):
-        super().__init__(model, strategy_selector, seed_selection_strategies, uncertainty_fn, filtering_fn, image, mask_generator, use_previous_logits)
+    def __init__(self, model, strategy_selector, seeds_selection_strategies, uncertainty_fn=uncertaintyH, filtering_fn=filterTrivial, image=None, mask_generator=None, use_previous_logits=True, GT_mask = None):
+        super().__init__(model, strategy_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, image, mask_generator, use_previous_logits)
         self.GT_mask = GT_mask
         self.need_ground_truth = True
     
@@ -110,14 +110,14 @@ class FPFNLearner(ActiveLearningSAM):
     def findNewSeed(self) -> np.ndarray:#find new seed using the FP and FN. 
         error = np.bitwise_xor(self.GT_mask, self.cp_mask)
         new_seed = swap(findVisualCenter(error))
-        return new_seed
+        return([new_seed])
 
 class RandomLearner(ActiveLearningSAM):
-    def __init__(self, model, strategy_selector, seed_selection_strategies, uncertainty_fn=uncertaintyH, filtering_fn=filterTrivial, image=None, mask_generator=None, use_previous_logits=True):
-        super().__init__(model, strategy_selector, seed_selection_strategies, uncertainty_fn, filtering_fn, image, mask_generator, use_previous_logits)
+    def __init__(self, model, strategy_selector, seeds_selection_strategies, uncertainty_fn=uncertaintyH, filtering_fn=filterTrivial, image=None, mask_generator=None, use_previous_logits=True):
+        super().__init__(model, strategy_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, image, mask_generator, use_previous_logits)
         random.seed(0)
 
     def findNewSeed(self) -> np.ndarray:
         h, w, _ = self.image.shape
         new_seed = [random.randint(0, h - 1), random.randint(0, w - 1)]
-        return(new_seed)
+        return([new_seed])
