@@ -8,13 +8,15 @@ def savePercentiles(learner, percentiles_points, percentiles):
     for i,p in enumerate(percentiles_points):
         percentiles[i].append(np.percentile(uncertainty, p))
 
-def plotAndSaveIntermediateResults(folder, learner, new_seeds, image, GT_mask, IoUs : list, FNs : list, FPs : list, i : int, idx : int, nb_seeds: int, NBS : list):
+def plotAndSaveIntermediateResults(folder, learner, next_seeds, image, GT_mask, IoUs : list, FNs : list, FPs : list, i : int, idx : int, nb_seeds: int, NBs : list):
     title_fontsize = 25
     xtick_fontsize = 20
     ytick_fontsize = 20
     plots_linewidth = 3
-    new_seed_s = 50
-    cp_mask = learner.cp_mask
+    new_seed_s = 180
+    seed_s = 130
+    mksize = 17
+    cp_mask = learner.cp_mask.astype("bool")
     fig, axes = plt.subplots(2, 3, layout = 'constrained')
     fig.set_figheight(15)
     fig.set_figwidth(23)
@@ -23,13 +25,21 @@ def plotAndSaveIntermediateResults(folder, learner, new_seeds, image, GT_mask, I
     prediction_i[cp_mask] = 0.7*image[cp_mask] + 0.3*np.array([75, 0, 125])
     axes[0, 0].imshow(prediction_i)
     if i != nb_seeds - 1:
-        green_new_seeds = [ns for ns in new_seeds if getLabel(ns, GT_mask)]
-        red_new_seeds = [ns for ns in new_seeds if (not getLabel(ns, GT_mask))]
-        axes[0, 0].scatter([ns[0] for ns in green_new_seeds], [ns[1] for ns in green_new_seeds], color = "green", s = new_seed_s)
-        axes[0, 0].scatter([ns[0] for ns in red_new_seeds], [ns[1] for ns in red_new_seeds], color = "red", s = new_seed_s)
-        axes[0, 0].set_title("Image with mask and new seed", fontsize = title_fontsize)
+        green_seeds = [s for s in learner.input_points if (getLabel(s, GT_mask) and not(s in next_seeds))]
+        red_seeds = [s for s in learner.input_points if (not(getLabel(s, GT_mask)) and not(s in next_seeds))]
+        green_new_seeds = [ns for ns in next_seeds if getLabel(ns, GT_mask)]
+        red_new_seeds = [ns for ns in next_seeds if (not getLabel(ns, GT_mask))]
+        axes[0, 0].scatter([ns[0] for ns in green_new_seeds], [ns[1] for ns in green_new_seeds], color = "green", marker = (5,2), s = new_seed_s)
+        axes[0, 0].scatter([ns[0] for ns in red_new_seeds], [ns[1] for ns in red_new_seeds], color = "red", marker = (5,2), s = new_seed_s)
+        axes[0, 0].scatter([s[0] for s in green_seeds], [s[1] for s in green_seeds], color = "green", s = seed_s)
+        axes[0, 0].scatter([s[0] for s in red_seeds], [s[1] for s in red_seeds], color = "red", s = seed_s)
+        axes[0, 0].set_title("Current segmentation and seeds", fontsize = title_fontsize)
     else:
-        axes[0, 0].set_title("Image with final mask", fontsize = title_fontsize)
+        green_seeds = [s for s in learner.input_points if (getLabel(s, GT_mask))]
+        red_seeds   = [s for s in learner.input_points if (not(getLabel(s, GT_mask)))]
+        axes[0, 0].scatter([s[0] for s in green_seeds], [s[1] for s in green_seeds], color = "green", s = seed_s)
+        axes[0, 0].scatter([s[0] for s in red_seeds], [s[1] for s in red_seeds], color = "red", s = seed_s)
+        axes[0, 0].set_title("Final segmentation and seeds", fontsize = title_fontsize)
     axes[0, 0].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[0, 0].tick_params(axis = "y", labelsize = ytick_fontsize) 
 
@@ -39,25 +49,48 @@ def plotAndSaveIntermediateResults(folder, learner, new_seeds, image, GT_mask, I
     axes[0, 1].tick_params(axis = "y", labelsize = ytick_fontsize) 
 
     uncertainty = learner.uncertainty_function(learner.evidence)
+    uncertainty = learner.filtering_function(learner, uncertainty)
     im2 = axes[0, 2].imshow(uncertainty)
-    axes[0, 2].set_title("Uncertainty", fontsize = title_fontsize)
+    axes[0, 2].set_title("Uncertainty (filtered)", fontsize = title_fontsize)
     axes[0, 2].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[0, 2].tick_params(axis = "y", labelsize = ytick_fontsize) 
 
-    axes[1, 0].plot(NBS, IoUs, linewidth = plots_linewidth)
+    green_xs = [nn for i,nn in enumerate(NBs)   if (learner.input_labels[i])]
+    red_xs   = [nn for i,nn in enumerate(NBs)   if (not learner.input_labels[i])]
+    green_IoUs_ys = [IoUs[i] for i in range(len(NBs)) if (learner.input_labels[i])]
+    red_IoUs_ys   = [IoUs[i] for i in range(len(NBs)) if (not learner.input_labels[i])]
+
+    axes[1, 0].plot(NBs, IoUs, linewidth = plots_linewidth)
     axes[1, 0].set_title("Intersection over Union (IoU)",  fontsize = title_fontsize)
     axes[1, 0].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[1, 0].tick_params(axis = "y", labelsize = ytick_fontsize) 
-                
-    axes[1, 1].plot(NBS, FPs, linewidth = plots_linewidth)
+    axes[1, 0].plot(green_xs, green_IoUs_ys, color = "green", marker = 'o', lw = 0, fillstyle='full', markersize=mksize)
+    axes[1, 0].plot(red_xs, red_IoUs_ys, color = "red", marker = 'o', lw = 0, fillstyle='none', markersize=mksize)
+    for x in learner.idx_when_strat_has_changed:
+        axes[1, 0].axvline(x=x, color = 'gray')
+
+
+    green_FPs_ys = [FPs[i] for i in range(len(NBs)) if (learner.input_labels[i])]
+    red_FPs_ys   = [FPs[i] for i in range(len(NBs)) if (not learner.input_labels[i])]
+    axes[1, 1].plot(NBs, FPs, linewidth = plots_linewidth)
     axes[1, 1].set_title("False Positives (FP)", fontsize = title_fontsize)
     axes[1, 1].tick_params(axis = "x", labelsize = xtick_fontsize) 
-    axes[1, 1].tick_params(axis = "y", labelsize = ytick_fontsize) 
-                
-    axes[1, 2].plot(NBS, FNs, linewidth = plots_linewidth)
+    axes[1, 1].tick_params(axis = "y", labelsize = ytick_fontsize)
+    axes[1, 1].plot(green_xs, green_FPs_ys, color = "green", marker = 'o', lw = 0, fillstyle='full', markersize=mksize)
+    axes[1, 1].plot(red_xs, red_FPs_ys, color = "red", marker = 'o', lw = 0, fillstyle='none', markersize=mksize)
+    for x in learner.idx_when_strat_has_changed:
+        axes[1, 1].axvline(x=x, color = 'gray')
+    
+    green_FNs_ys = [FNs[i] for i in range(len(NBs)) if (learner.input_labels[i])]
+    red_FNs_ys   = [FNs[i] for i in range(len(NBs)) if (not learner.input_labels[i])]           
+    axes[1, 2].plot(NBs, FNs, linewidth = plots_linewidth)
     axes[1, 2].set_title("False Negatives (FN)", fontsize = title_fontsize)
     axes[1, 2].tick_params(axis = "x", labelsize = xtick_fontsize) 
     axes[1, 2].tick_params(axis = "y", labelsize = ytick_fontsize) 
+    axes[1, 2].plot(green_xs, green_FNs_ys, color = "green", marker = 'o', lw = 0, fillstyle='full', markersize=mksize)
+    axes[1, 2].plot(red_xs, red_FNs_ys, color = "red", marker = 'o', lw = 0, fillstyle='none', markersize=mksize)
+    for x in learner.idx_when_strat_has_changed:
+        axes[1, 2].axvline(x=x, color = 'gray')
                 
     fig.colorbar(im1, ax = axes[0, 1], location = "right",  shrink = 1)
     fig.colorbar(im2, ax = axes[0, 2], location = "right",  shrink = 1)
@@ -83,8 +116,8 @@ def plotAndSaveImageWithGT(folder, image, GT_mask, idx : int):
     plt.savefig(os.path.join(folder, f"Image n°{idx} with GT.png"))
     plt.clf()
     
-def plotAndSaveFinalIoUEvolution(folder, NBS, IoUs, idx : int):
-    plt.plot(NBS, IoUs)
+def plotAndSaveFinalIoUEvolution(folder, NBs, IoUs, idx : int):
+    plt.plot(NBs, IoUs)
     plt.xlabel("Nb of seeds")
     plt.ylabel('IoU')
     plt.savefig(os.path.join(folder, f'IoU_{idx}.png'))
@@ -92,9 +125,9 @@ def plotAndSaveFinalIoUEvolution(folder, NBS, IoUs, idx : int):
 
         
 
-def savePercentilesPlot(folder, NBS, percentiles, idx : int):
+def savePercentilesPlot(folder, NBs, percentiles, idx : int):
     for i,history in enumerate(percentiles):
-        plt.plot(NBS, history)
+        plt.plot(NBs, history)
     plt.savefig(os.path.join(folder, f"Uncertainty percentiles evolution n°{idx}.png"))
     plt.clf()
     

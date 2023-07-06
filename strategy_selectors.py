@@ -2,15 +2,13 @@ import numpy as np
 from tools import *
 
 
-def singleStrat(current_strategy : int, input_points : list, input_labels : list) -> int:
+def singleStrat(learner) -> int:
     return(0)
 
-def changeAtFirstMito(current_strategy : int, input_points : list, input_labels : list) -> int:
-    return(int((current_strategy == 1) or (True in input_labels)))
+def changeAtFirstMito(learner) -> int:
+    return(int((learner.current_strategy_idx == 1) or (True in learner.input_labels)))
 
-def changeAfterAGivenAmountOfSeed(current_strategy : int, input_points : list, input_labels : list) -> int:
-    if ((current_strategy == 1) or (len(input_points) >= 15 and (True in input_labels))):
-        return(1)
-    else:
-        return(0)
+def changeAfterAGivenAmountOfSeed(learner) -> int:
+    return(int((learner.current_strategy_idx == 1) or (len(learner.input_labels) >= 35 and (True in learner.input_labels))))
+
 

@@ -8,6 +8,16 @@ from tools import *
 from typing import Tuple
 
 
+def removeTooCloseSeeds(seeds : list) -> list:
+    points_that_need_to_be_deleted = []
+    for i, seed_a in enumerate(seeds):
+        for seed_b in seeds[i+1:]:
+            if (seed_a[0] - seed_b[0])**2 + (seed_a[1] - seed_b[1])**2 <= 25:
+                points_that_need_to_be_deleted.append(seed_a)
+                break
+    return([s for s in seeds if not s in points_that_need_to_be_deleted])
+            
+
 
 def centroid(mask : np.ndarray):
     a, b = np.where(mask)

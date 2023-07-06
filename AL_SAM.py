@@ -13,20 +13,23 @@ from Learners import *
 from tools import *
 from plot_tools import *
 from filters import *
+from learning_strategies import *
 
 SUBSET_SIZE = 1
 TRAIN_RATIO = 1
 LOAD_DATA_ONCE_FOR_ALL = True
 CHOOSE_DATA_AT_RANDOM = False
 
-LEARNER_TYPE = "FPFN" #{"Active Learning", "FPFN", "Random"}
-STRATEGY_SELECTOR = changeAfterAGivenAmountOfSeed
-SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxUncertainty] #{ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist}
+LEARNER_TYPE = "Active Learning" #{"Active Learning", "FPFN", "Random"}
+STRATEGY_SELECTOR = changeAfterAGivenAmountOfSeed #{singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed}
+LEARNING_STRATEGIES = [oneSeedForOneMaskLS] #{basicLS, oneSeedForOneMaskLS}
+USE_PREVIOUS_LOGITS = False #change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
+SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxUncertainty] #{ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH #{uncertaintyH, uncertaintyKL}
-FILTERING_FUNCTION = filterWithDist #{filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton}
-USE_PREVIOUS_LOGITS = True
-USE_BUDGET = False
-ANNOTATION_BUDGET = 20
+FILTERING_FUNCTION =  filterWithDist #{filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton}
+FILTERING_AUX_FONCTION = evidenceSmallerOrEqualToZero #{evidenceSmallerOrEqualToZero, threshOnUncertainty}
+USE_BUDGET = True
+ANNOTATION_BUDGET = 100
 
 SAVE_INTERMEDIATE_RESULTS = True
 SAVE_IMAGE_WITH_GT = True
@@ -106,11 +109,11 @@ if __name__ == "__main__":
     
     #Instancing a learning algorithm
     if   LEARNER_TYPE == "Active Learning":
-        learner = ActiveLearningSAM(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
+        learner = ActiveLearningSAM(sam, STRATEGY_SELECTOR,LEARNING_STRATEGIES, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     elif LEARNER_TYPE == "FPFN":
-        learner = FPFNLearner(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
+        learner = FPFNLearner(sam, STRATEGY_SELECTOR,LEARNING_STRATEGIES, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     elif LEARNER_TYPE == "Random":
-        learner = RandomLearner(sam, STRATEGY_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
+        learner = RandomLearner(sam, STRATEGY_SELECTOR,LEARNING_STRATEGIES, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     else:
         raise ValueError('Unknown learner type')
     
@@ -127,8 +130,9 @@ if __name__ == "__main__":
         if SAVE_IMAGE_WITH_GT:
             plotAndSaveImageWithGT(FOLDER_FOR_INTERMEDIATE_RESULTS, image, GT_mask, idx)
 
-        #Give image and GTmask (if needed) to the learner
         learner.setData(image)
+
+        #Give image and GTmask (if needed) to the learner
         if learner.need_ground_truth:
             learner.setGroundTruthMask(GT_mask)
         
@@ -152,39 +156,41 @@ if __name__ == "__main__":
         IoUs = []
         FPs = []
         FNs = []
-        new_seeds = [first_seed.copy()]
-        NBS = []
+        next_seeds = [first_seed.copy()]
+        NBs = []
 
         if USE_BUDGET:
             nb_seeds = ANNOTATION_BUDGET
             
         for i in range(nb_seeds):
 
-            input_points += new_seeds
-            input_labels += [getLabel(new_seed, GT_mask) for new_seed in new_seeds]
+            input_points += next_seeds
+            input_labels += [getLabel(new_seed, GT_mask) for new_seed in next_seeds]
             
             learner.learn(input_points, input_labels)
-            NBS.append(NBS[-1] + len(new_seeds) if len(NBS) > 0 else len(new_seeds))
-            if i != nb_seeds -1:
-                new_seeds = learner.findNewSeeds()
                 
             #Save results
+            NBs.append(NBs[-1] + len(next_seeds) if len(NBs) > 0 else len(next_seeds))
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
             FPs.append(FP(learner.cp_mask, GT_mask)) 
             FNs.append(FN(learner.cp_mask, GT_mask)) 
             
+            #find the next seeds
+            if i != nb_seeds -1:
+                next_seeds = learner.findNextSeeds()
             
             if SAVE_INTERMEDIATE_RESULTS:#draw i-th prediction
-                plotAndSaveIntermediateResults(FOLDER_FOR_INTERMEDIATE_RESULTS, learner, new_seeds, image, GT_mask, IoUs, FNs, FPs, i, idx, nb_seeds, NBS)
+                plotAndSaveIntermediateResults(FOLDER_FOR_INTERMEDIATE_RESULTS, learner, next_seeds, image, GT_mask, IoUs, FNs, FPs, i, idx, nb_seeds, NBs)
             
             if SAVE_UNCERTAINTY_PERCENTILES:
                 savePercentiles(learner, percentiles_points, percentiles)
+            
         
         if SAVE_UNCERTAINTY_PERCENTILES:
-            savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, NBS, percentiles, idx)
+            savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, NBs, percentiles, idx)
             
         if SAVE_FINAL_IOU_EVOLUTION:
-            plotAndSaveFinalIoUEvolution(FOLDER_FOR_FINAL_RESULTS, NBS, IoUs, idx)
+            plotAndSaveFinalIoUEvolution(FOLDER_FOR_FINAL_RESULTS, NBs, IoUs, idx)
         
 
         """

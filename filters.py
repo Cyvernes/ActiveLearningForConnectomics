@@ -3,42 +3,46 @@ from tools import *
 from plot_tools import *
 
 
-def filterTrivial(arr: np.ndarray, evidence = None) -> np.ndarray:
-    return(arr)
+def evidenceSmallerOrEqualToZero(learner) -> np.ndarray:
+    blob = learner.evidence < 0
+    blob = blob.astype("uint8")
+    return(blob)
 
-def filterWithDist(arr : np.ndarray, evidence : np.ndarray) -> np.ndarray:
+def threshOnUncertainty(learner) -> np.ndarray:
     min_p_thresh = 0.001
     max_p_thresh = 0.7
     max_evidence_thresh = np.log(max_p_thresh/ (1 - max_p_thresh))
     min_evidence_thresh = np.log(min_p_thresh/ (1 - min_p_thresh))
-    blob =  evidence < max_evidence_thresh
-    blob[evidence > min_evidence_thresh] = 0
+    blob = learner.evidence < max_evidence_thresh
+    blob[learner.evidence > min_evidence_thresh] = 0
     blob = blob.astype("uint8")
+    return(blob)
+    
+
+def filterTrivial(learner, arr: np.ndarray) -> np.ndarray:
+    return(arr)
+
+def filterWithDist(learner, arr : np.ndarray) -> np.ndarray:
+    blob = learner.filtering_aux_function(learner)
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
-    print('------------')
-    arr = np.multiply(arr, sigmoid(dist - np.max(dist)/3))
+    arr = np.multiply(arr, sigmoid(dist - 10))
     return(arr)
 
-def filterWithDistWithBorder(arr : np.ndarray, evidence : np.ndarray) -> np.ndarray:
-    min_p_thresh = 0.001
-    max_p_thresh = 0.7
-    max_evidence_thresh = np.log(max_p_thresh/ (1 - max_p_thresh))
-    min_evidence_thresh = np.log(min_p_thresh/ (1 - min_p_thresh))
-    blob =  evidence < max_evidence_thresh
-    blob[evidence > min_evidence_thresh] = 0
-    blob = blob.astype("uint8")
+def filterWithDistWithBorder(learner, arr : np.ndarray) -> np.ndarray:
+    blob = learner.filtering_aux_function(learner)
     a, b = blob.shape
     cv2.rectangle(blob, (0, 0), (a - 1, b - 1), (0), 1)
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
     arr = np.multiply(arr, sigmoid(dist - np.max(dist)/3))
     return(arr)
 
-def filterWithPercentile(arr : np.ndarray, evidence = None) -> np.ndarray:
+def filterWithPercentile(learner, arr : np.ndarray) -> np.ndarray:
     percentile_thresh = 80
     arr[arr >= np.percentile(arr, percentile_thresh )] = 0
     return(arr)
 
-def filterWithDistSkeleton(arr : np.ndarray, evidence : np.ndarray) -> np.ndarray:
+def filterWithDistSkeleton(learner, arr : np.ndarray) -> np.ndarray:
+    evidence = learner.evidence
     p_thresh = 0.95
     evidence_thresh = np.log(p_thresh/(1 - p_thresh))
     skeleton_mask = skeleton(evidence < evidence_thresh)
