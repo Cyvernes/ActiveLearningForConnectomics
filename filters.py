@@ -8,13 +8,20 @@ def evidenceSmallerOrEqualToZero(learner) -> np.ndarray:
     blob = blob.astype("uint8")
     return(blob)
 
+def NotInMasksFromOneSeedOneMask(learner) -> np.ndarray:
+    blob = learner.masks_from_single_seeds != True
+    blob = blob.astype("uint8")
+    return(blob)
+
 def threshOnUncertainty(learner) -> np.ndarray:
-    min_p_thresh = 0.001
+    min_p_thresh = 0
     max_p_thresh = 0.7
     max_evidence_thresh = np.log(max_p_thresh/ (1 - max_p_thresh))
-    min_evidence_thresh = np.log(min_p_thresh/ (1 - min_p_thresh))
+    if min_p_thresh != 0:
+        min_evidence_thresh = np.log(min_p_thresh/ (1 - min_p_thresh))
     blob = learner.evidence < max_evidence_thresh
-    blob[learner.evidence > min_evidence_thresh] = 0
+    if min_p_thresh != 0:
+        blob[learner.evidence > min_evidence_thresh] = 0
     blob = blob.astype("uint8")
     return(blob)
     
@@ -25,7 +32,7 @@ def filterTrivial(learner, arr: np.ndarray) -> np.ndarray:
 def filterWithDist(learner, arr : np.ndarray) -> np.ndarray:
     blob = learner.filtering_aux_function(learner)
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
-    arr = np.multiply(arr, sigmoid(dist - 10))
+    arr = np.multiply(arr, sigmoid(dist - 20))
     return(arr)
 
 def filterWithDistWithBorder(learner, arr : np.ndarray) -> np.ndarray:
