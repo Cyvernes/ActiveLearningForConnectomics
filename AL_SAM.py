@@ -19,17 +19,17 @@ from data_tools import *
 
 
 #Learner parameters
-LEARNER_TYPE = "Active Learning" #{"Active Learning", "FPFN", "Random"}
-STRATEGY_SELECTOR = changeGivenAmountOfSeenMito #{singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
+LEARNER_TYPE = "Pseudo Active Learning" #{"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
+STRATEGY_SELECTOR = singleStrat #{singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
 LEARNING_STRATEGIES = [oneSeedForOneMaskLS] #{basicLS, oneSeedForOneMaskLS, oneSeedForOneMaskLSWithDropOut}
-FIRST_SEEDS_SELECTOR = popLastSESeeds #{popLastSESeeds, allSESeeds}
-SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxUncertainty] #{ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence}
+FIRST_SEEDS_SELECTOR = allForegroundSESeeds #{popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
+SEED_SELECTION_STRATEGIES = [ArgmaxEvidence] #{ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH #{uncertaintyH, uncertaintyKL}
 FILTERING_FUNCTION =  filterWithDist #{filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton}
 FILTERING_AUX_FONCTION = threshOnUncertainty #{evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromOneSeedOneMask}
 USE_PREVIOUS_LOGITS = False #change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
 USE_BUDGET = True
-ANNOTATION_BUDGET = 5
+ANNOTATION_BUDGET = 50
 
 #Plots and results parameters
 SAVE_INTERMEDIATE_RESULTS = True
@@ -37,7 +37,7 @@ SAVE_IMAGE_WITH_GT = True
 SAVE_FIRST_SEED = True
 SAVE_FINAL_IOU_EVOLUTION = True
 SAVE_UNCERTAINTY_PERCENTILES = True
-SAVE_AGGREGATED_RESULTS = True
+SAVE_AGGREGATED_RESULTS = False
 
 #Data parameters
 SUBSET_SIZE = 1
@@ -58,8 +58,8 @@ SPECIFIC_MASK_LINKS =  [ '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/We
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/masks/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/masks/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff',
                          '/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/masks/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff'      ]
-SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[0]]
-SPECIFIC_MASK_LINKS  = [SPECIFIC_MASK_LINKS[0]]
+SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[3]]
+SPECIFIC_MASK_LINKS  = [SPECIFIC_MASK_LINKS[3]]
 
 if __name__ == "__main__":
     """
@@ -120,6 +120,8 @@ if __name__ == "__main__":
     #Instancing a learning algorithm
     if   LEARNER_TYPE == "Active Learning":
         learner = ActiveLearningSAM(sam, STRATEGY_SELECTOR, LEARNING_STRATEGIES, FIRST_SEEDS_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
+    elif  LEARNER_TYPE == "Pseudo Active Learning":
+        learner = PseudoActiveLearningSAM(sam, STRATEGY_SELECTOR, LEARNING_STRATEGIES, FIRST_SEEDS_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     elif LEARNER_TYPE == "FPFN":
         learner = FPFNLearner(sam, STRATEGY_SELECTOR, LEARNING_STRATEGIES, FIRST_SEEDS_SELECTOR, SEED_SELECTION_STRATEGIES, UNCERTAINTY_FUNCTION_TYPE, FILTERING_FUNCTION, FILTERING_AUX_FONCTION, use_previous_logits=USE_PREVIOUS_LOGITS)
     elif LEARNER_TYPE == "Random":
@@ -181,17 +183,15 @@ if __name__ == "__main__":
         budget = ANNOTATION_BUDGET if USE_BUDGET else nb_seeds
         nb_annotations = 0
         count = 0
-            
         while nb_annotations < budget:
 
             input_points += next_seeds
             input_labels += [getLabel(new_seed, GT_mask) for new_seed in next_seeds]
             nb_annotations += len(next_seeds)
-            
             learner.learn(input_points, input_labels)
-                
+            
             #Save results
-            NBs.append(NBs[-1] + len(next_seeds) if len(NBs) > 0 else len(next_seeds))
+            NBs.append(len(input_points))
             IoUs.append(IoU(learner.cp_mask, GT_mask)) 
             FPs.append(FP(learner.cp_mask, GT_mask)) 
             FNs.append(FN(learner.cp_mask, GT_mask)) 
@@ -199,14 +199,18 @@ if __name__ == "__main__":
             #find the next seeds
             if nb_annotations < budget:
                 next_seeds = learner.findNextSeeds()
+            else:
+                next_seeds = []
+                
+            count += 1
             
-            if SAVE_INTERMEDIATE_RESULTS:#draw nb_annotations-th prediction
-                plotAndSaveIntermediateResults(FOLDER_FOR_INTERMEDIATE_RESULTS, learner, next_seeds, image, GT_mask, IoUs, FNs, FPs, count, idx, nb_seeds, NBs)
+            if SAVE_INTERMEDIATE_RESULTS:#draw count-th prediction
+                plotAndSaveIntermediateResults(FOLDER_FOR_INTERMEDIATE_RESULTS, learner, next_seeds, image, GT_mask, IoUs, FNs, FPs, count, idx, NBs)
             
             if SAVE_UNCERTAINTY_PERCENTILES:
                 savePercentiles(learner, percentiles_points, percentiles)
             
-            count += 1
+            
             
 
         if SAVE_UNCERTAINTY_PERCENTILES:
@@ -233,8 +237,9 @@ if __name__ == "__main__":
         """
         Testing
         """
-        print('-------------------------------------')
-        print("Testing...")
+    print('-------------------------------------')
+    print("Testing...")
+    print('Not implemented')
         
 
 

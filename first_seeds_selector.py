@@ -1,4 +1,5 @@
 from typing import List, Tuple
+from tools import *
 
 def popLastSESeeds(learner) -> List[Tuple[int, int]]:
     SE_mask = learner.SE_masks.pop(-1)['segmentation'] 
@@ -12,8 +13,9 @@ def allSESeeds(learner) -> List[Tuple[int, int]]:
     return(first_seeds, SE_mask)
 
 def allForegroundSESeeds(learner) -> List[Tuple[int, int]]:
+    assert learner.need_ground_truth, "Learner does not have access to Ground Truth, maybe you should use the PseudoActiveLearningSAM class instead"
     SE_mask = learner.SE_masks.pop(-1)['segmentation'] 
-    first_seeds = learner.SE_Seeds
+    first_seeds = [ s for s in learner.SE_Seeds if getValueinArrFromInputFormat(learner.GT_mask, s)]
     learner.SE_seeds = []
     return(first_seeds, SE_mask)
     

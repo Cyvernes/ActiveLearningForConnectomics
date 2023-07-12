@@ -18,7 +18,6 @@ def removeTooCloseSeeds(seeds : list) -> list:
     return([s for s in seeds if not s in points_that_need_to_be_deleted])
             
 
-
 def centroid(mask : np.ndarray):
     a, b = np.where(mask)
     return(int(np.mean(a)), int(np.mean(b)))

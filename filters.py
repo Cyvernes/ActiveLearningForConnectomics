@@ -32,7 +32,7 @@ def filterTrivial(learner, arr: np.ndarray) -> np.ndarray:
 def filterWithDist(learner, arr : np.ndarray) -> np.ndarray:
     blob = learner.filtering_aux_function(learner)
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
-    arr = np.multiply(arr, sigmoid(dist - 20))
+    arr = np.multiply(arr, sigmoid(dist - 10))
     return(arr)
 
 def filterWithDistWithBorder(learner, arr : np.ndarray) -> np.ndarray:

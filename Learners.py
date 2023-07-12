@@ -146,3 +146,11 @@ class RandomLearner(ActiveLearningSAM):
         return([new_seed])
     
 
+class PseudoActiveLearningSAM(ActiveLearningSAM):
+    def __init__(self, model, strategy_selector, learning_strategies, first_seeds_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, filtering_aux_fn, image=None, mask_generator=None, use_previous_logits=True):
+        super().__init__(model, strategy_selector, learning_strategies, first_seeds_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, filtering_aux_fn, image, mask_generator, use_previous_logits)
+        self.GT_mask = None
+        self.need_ground_truth = True
+        
+    def setGroundTruthMask(self, mask : np.ndarray):
+        self.GT_mask = mask.astype("uint8")
