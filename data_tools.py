@@ -2,8 +2,7 @@ import os
 import glob
 
 
-
-def retrieveLinksForOneImageInEachFolder():#R
+def retrieveLinksForOneImageInEachFolder():  # R
     # Retrieve one image from each folder
     base_dir = "../../data/cem_mitolab"
 
