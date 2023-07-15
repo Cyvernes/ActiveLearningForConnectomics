@@ -321,9 +321,9 @@ if __name__ == "__main__":
             images_FNs_at_max_IoU,
             images_nb_seeds,
         )
-        """
-        Testing
-        """
+    """
+    Testing
+    """
     print("-------------------------------------")
     print("Testing...")
     print("Not implemented")

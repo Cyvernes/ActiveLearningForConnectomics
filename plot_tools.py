@@ -279,8 +279,14 @@ def plotAndSave(arr: np.array, name):
     plt.clf()
 
 
-def plotandSaveAggregatedResults(folder, IoUs, FPs, FNs, final_nb_seeds):  # R
+def plotandSaveAggregatedResults(folder, aggregated_results):
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+
+    # Extract data from aggregated_results
+    IoUs = aggregated_results['images_max_IoUs']
+    FPs = aggregated_results['images_FPs_at_max_IoU']
+    FNs = aggregated_results['images_FNs_at_max_IoU']
+    final_nb_seeds = aggregated_results['images_nb_seeds']
 
     # Plot IoUs
     axs[0, 0].hist(IoUs, bins=10, edgecolor="black")
@@ -308,5 +314,5 @@ def plotandSaveAggregatedResults(folder, IoUs, FPs, FNs, final_nb_seeds):  # R
 
     # Add spacing between plots
     plt.tight_layout()
-    plt.savefig(os.path.join(folder, f"Final Results"))
+    plt.savefig(os.path.join(folder, "Final Results"))
     plt.clf()
