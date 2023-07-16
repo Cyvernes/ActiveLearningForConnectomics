@@ -20,8 +20,6 @@ def allForegroundSESeeds(learner) -> List[Tuple[int, int]]:
         learner.need_ground_truth
     ), "Learner does not have access to Ground Truth, maybe you should use the PseudoActiveLearningSAM class instead"
     SE_mask = learner.SE_masks.pop(-1)["segmentation"]
-    first_seeds = [
-        s for s in learner.SE_Seeds if getValueinArrFromInputFormat(learner.GT_mask, s)
-    ]
+    first_seeds = [s for s in learner.SE_Seeds if getValueinArrFromInputFormat(learner.GT_mask, s)]
     learner.SE_seeds = []
     return (first_seeds, SE_mask)

@@ -11,7 +11,7 @@ def evidenceSmallerOrEqualToZero(learner) -> np.ndarray:
 
 
 def NotInMasksFromOneSeedOneMask(learner) -> np.ndarray:
-    blob = learner.masks_from_single_seeds != True
+    blob = learner.masks_from_single_seeds <= 0
     blob = blob.astype("uint8")
     return blob
 
@@ -73,7 +73,7 @@ def filterGaussianDistFromKnownSeeds(learner, arr: np.ndarray) -> np.ndarray:
     filter_arr = np.zeros_like(arr)
     x_coords, y_coords = zip(*learner.input_points)
     filter_arr[y_coords, x_coords] = 1
-    filter_arr = scipy.ndimage.gaussian_filter(filter_arr, sigma=30)
+    filter_arr = scipy.ndimage.gaussian_filter(filter_arr, sigma=50)
     maxx = np.max(filter_arr)
     filter_arr = filter_arr / maxx if maxx != 0 else filter_arr
     arr = np.multiply(arr, 1 - filter_arr)
@@ -83,4 +83,10 @@ def filterGaussianDistFromKnownSeeds(learner, arr: np.ndarray) -> np.ndarray:
 def HybridGDFKS_hard(learner, arr: np.ndarray) -> np.ndarray:
     arr = filterGaussianDistFromKnownSeeds(learner, arr)
     arr = hardFilter(learner, arr)
+    return arr
+
+
+def HybridGDFKS_Dist(learner, arr: np.ndarray) -> np.ndarray:
+    arr = filterGaussianDistFromKnownSeeds(learner, arr)
+    arr = filterWithDist(learner, arr)
     return arr

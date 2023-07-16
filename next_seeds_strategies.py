@@ -15,9 +15,7 @@ def ArgmaxEvInSESeeds(learner) -> list:
 def ArgmaxUncertaintyInSESeeds(learner) -> list:
     uncertainty = learner.uncertainty_function(learner.evidence)
     uncertainty = learner.filtering_function(learner, uncertainty)
-    learner.SE_Seeds = sorted(
-        learner.SE_Seeds, key=lambda x: getValueinArrFromInputFormat(uncertainty, x)
-    )
+    learner.SE_Seeds = sorted(learner.SE_Seeds, key=lambda x: getValueinArrFromInputFormat(uncertainty, x))
     next_seed = learner.SE_Seeds.pop(-1)
     return [next_seed]
 
@@ -40,22 +38,19 @@ def ArgmaxUncertainty(learner) -> list:
 
 def ArgmaxEvidence(learner) -> list:
     if learner.filtering_function != hardFilter:
-        Warning.warn(
-            "Applying a smooth filter may not work for argmaxEvidence because evidence can be non positive"
-        )
+        Warning.warn("Applying a smooth filter may not work for argmaxEvidence because evidence can be non positive")
     evidence = learner.filtering_function(learner, learner.evidence)
     cx, cy = np.unravel_index(np.argmax(evidence), learner.evidence.shape)
     next_seed = [cy, cx]  # swap cx and cy to meet input format
     return [next_seed]
 
 
-# similar to argmax evidence but the metrics is positive so the filters behave correctly
-def ArgmaxForegroundProbability(learner) -> list:
+def ArgmaxForegroundProbability(
+    learner,
+) -> list:  # similar to argmax evidence but the metrics is positive so the filters behave correctly
     foreground_probability = sigmoid(learner.evidence)
     foreground_probability = learner.filtering_function(learner, foreground_probability)
-    cx, cy = np.unravel_index(
-        np.argmax(foreground_probability), foreground_probability.shape
-    )
+    cx, cy = np.unravel_index(np.argmax(foreground_probability), foreground_probability.shape)
     next_seed = [cy, cx]  # swap cx and cy to meet input format
     return [next_seed]
 

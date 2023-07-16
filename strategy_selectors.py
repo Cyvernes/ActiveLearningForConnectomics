@@ -11,11 +11,10 @@ def changeAtFirstMito(learner) -> int:
 
 
 def changeGivenAmountOfSeenMito(learner) -> int:
-    return int((learner.current_strategy_idx == 1) or (sum(learner.input_labels)) >= 5)
+    return int((learner.current_strategy_idx == 1) or (sum(learner.input_labels)) >= 2)
 
 
 def changeAfterAGivenAmountOfSeed(learner) -> int:
     return int(
-        (learner.current_strategy_idx == 1)
-        or (len(learner.input_labels) >= 35 and (True in learner.input_labels))
+        (learner.current_strategy_idx == 1) or (len(learner.input_labels) >= 35 and (True in learner.input_labels))
     )

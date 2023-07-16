@@ -1,21 +1,22 @@
-#from segment_anything import SamPredictor
+# from segment_anything import SamPredictor
 import numpy as np
 import torch
 
 from typing import Optional, Tuple
 from segment_anything import SamPredictor
 
+
 class SamPredictorWithDropOut(SamPredictor):
-    def __init__(self, sam_model, p = 0.2, use_dropout  = False) -> None:
+    def __init__(self, sam_model, p=0.2, use_dropout=False) -> None:
         super().__init__(sam_model)
         self.p = p
         self.dropout = torch.nn.Dropout(p=p)
         self.use_dropout = use_dropout
-    
+
     def setDropOutParameter(self, p):
-      self.p = p
-      self.dropout.p = p
-    
+        self.p = p
+        self.dropout.p = p
+
     @torch.no_grad()
     def predict_torch(
         self,
@@ -27,7 +28,7 @@ class SamPredictorWithDropOut(SamPredictor):
         return_logits: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        This method is the same than the original SamPredictor 
+        This method is the same than the original SamPredictor
         Predict masks for the given input prompts, using the currently set image.
         Input prompts are batched torch tensors and are expected to already be
         transformed to the input frame using ResizeLongestSide.
@@ -78,10 +79,18 @@ class SamPredictorWithDropOut(SamPredictor):
         )
         # Predict masks
         low_res_masks, iou_predictions = self.model.mask_decoder(
-            image_embeddings= self.dropout(self.features) if self.use_dropout else self.features,#the embeddings from the image encoder
-            image_pe= self.dropout(self.model.prompt_encoder.get_dense_pe()) if (False and self.use_dropout) else self.model.prompt_encoder.get_dense_pe() ,#positional encoding with the shape of image_embeddings
-            sparse_prompt_embeddings= self.dropout(sparse_embeddings) if (False and self.use_dropout) else sparse_embeddings,#the embeddings of the points and boxes
-            dense_prompt_embeddings= self.dropout(dense_embeddings) if (False and self.use_dropout) else dense_embeddings,#the embeddings of the mask inputs
+            image_embeddings=self.dropout(self.features)
+            if self.use_dropout
+            else self.features,  # the embeddings from the image encoder
+            image_pe=self.dropout(self.model.prompt_encoder.get_dense_pe())
+            if (False and self.use_dropout)
+            else self.model.prompt_encoder.get_dense_pe(),  # positional encoding with the shape of image_embeddings
+            sparse_prompt_embeddings=self.dropout(sparse_embeddings)
+            if (False and self.use_dropout)
+            else sparse_embeddings,  # the embeddings of the points and boxes
+            dense_prompt_embeddings=self.dropout(dense_embeddings)
+            if (False and self.use_dropout)
+            else dense_embeddings,  # the embeddings of the mask inputs
             multimask_output=multimask_output,
         )
 

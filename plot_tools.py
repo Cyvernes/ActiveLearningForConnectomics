@@ -41,16 +41,8 @@ def plotAndSaveIntermediateResults(
     prediction_i[cp_mask] = 0.7 * image[cp_mask] + 0.3 * np.array([75, 0, 125])
     axes[0, 0].imshow(prediction_i)
     if next_seeds != []:
-        green_seeds = [
-            s
-            for s in learner.input_points
-            if (getLabel(s, GT_mask) and not (s in next_seeds))
-        ]
-        red_seeds = [
-            s
-            for s in learner.input_points
-            if (not (getLabel(s, GT_mask)) and not (s in next_seeds))
-        ]
+        green_seeds = [s for s in learner.input_points if (getLabel(s, GT_mask) and not (s in next_seeds))]
+        red_seeds = [s for s in learner.input_points if (not (getLabel(s, GT_mask)) and not (s in next_seeds))]
         green_new_seeds = [ns for ns in next_seeds if getLabel(ns, GT_mask)]
         red_new_seeds = [ns for ns in next_seeds if (not getLabel(ns, GT_mask))]
         axes[0, 0].scatter(
@@ -73,9 +65,7 @@ def plotAndSaveIntermediateResults(
             color="green",
             s=seed_s,
         )
-        axes[0, 0].scatter(
-            [s[0] for s in red_seeds], [s[1] for s in red_seeds], color="red", s=seed_s
-        )
+        axes[0, 0].scatter([s[0] for s in red_seeds], [s[1] for s in red_seeds], color="red", s=seed_s)
         axes[0, 0].set_title("Current segmentation and seeds", fontsize=title_fontsize)
     else:  # last iteration
         green_seeds = [s for s in learner.input_points if (getLabel(s, GT_mask))]
@@ -86,9 +76,7 @@ def plotAndSaveIntermediateResults(
             color="green",
             s=seed_s,
         )
-        axes[0, 0].scatter(
-            [s[0] for s in red_seeds], [s[1] for s in red_seeds], color="red", s=seed_s
-        )
+        axes[0, 0].scatter([s[0] for s in red_seeds], [s[1] for s in red_seeds], color="red", s=seed_s)
         axes[0, 0].set_title("Final segmentation and seeds", fontsize=title_fontsize)
     axes[0, 0].tick_params(axis="x", labelsize=xtick_fontsize)
     axes[0, 0].tick_params(axis="y", labelsize=ytick_fontsize)
@@ -105,25 +93,13 @@ def plotAndSaveIntermediateResults(
     axes[0, 2].tick_params(axis="x", labelsize=xtick_fontsize)
     axes[0, 2].tick_params(axis="y", labelsize=ytick_fontsize)
 
-    green_xs = [
-        nn
-        for i, nn in enumerate(NBs)
-        if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
-    ]
-    red_xs = [
-        nn
-        for i, nn in enumerate(NBs)
-        if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
-    ]
+    green_xs = [nn for i, nn in enumerate(NBs) if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])]
+    red_xs = [nn for i, nn in enumerate(NBs) if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])]
     green_IoUs_ys = [
-        IoUs[i]
-        for i in range(len(NBs))
-        if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        IoUs[i] for i in range(len(NBs)) if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
     red_IoUs_ys = [
-        IoUs[i]
-        for i in range(len(NBs))
-        if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        IoUs[i] for i in range(len(NBs)) if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
 
     axes[1, 0].plot(NBs, IoUs, linewidth=plots_linewidth)
@@ -152,14 +128,10 @@ def plotAndSaveIntermediateResults(
         axes[1, 0].axvline(x=x, color="gray")
 
     green_FPs_ys = [
-        FPs[i]
-        for i in range(len(NBs))
-        if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        FPs[i] for i in range(len(NBs)) if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
     red_FPs_ys = [
-        FPs[i]
-        for i in range(len(NBs))
-        if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        FPs[i] for i in range(len(NBs)) if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
     axes[1, 1].plot(NBs, FPs, linewidth=plots_linewidth)
     axes[1, 1].set_title("False Positives (FP)", fontsize=title_fontsize)
@@ -187,14 +159,10 @@ def plotAndSaveIntermediateResults(
         axes[1, 1].axvline(x=x, color="gray")
 
     green_FNs_ys = [
-        FNs[i]
-        for i in range(len(NBs))
-        if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        FNs[i] for i in range(len(NBs)) if (True in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
     red_FNs_ys = [
-        FNs[i]
-        for i in range(len(NBs))
-        if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
+        FNs[i] for i in range(len(NBs)) if (False in learner.input_labels[0 if i == 0 else NBs[i - 1] : NBs[i]])
     ]
     axes[1, 2].plot(NBs, FNs, linewidth=plots_linewidth)
     axes[1, 2].set_title("False Negatives (FN)", fontsize=title_fontsize)
@@ -237,9 +205,7 @@ def plotAndSaveImageWithFirstSeed(folder, image, first_seeds, idx: int):
     plt.clf()
 
 
-def plotAndSaveImageWithFirstSeedandFirstMask(
-    folder, image, first_mask, first_seeds, idx: int
-):
+def plotAndSaveImageWithFirstSeedandFirstMask(folder, image, first_mask, first_seeds, idx: int):
     imagewsem = image.copy()
     imagewsem[first_mask] = 0.7 * image[first_mask] + 0.3 * np.array([75, 0, 125])
     plt.imshow(imagewsem)
@@ -279,6 +245,7 @@ def plotAndSave(arr: np.array, name):
     plt.clf()
 
 
+
 def plotandSaveAggregatedResults(folder, aggregated_results):
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
@@ -316,3 +283,4 @@ def plotandSaveAggregatedResults(folder, aggregated_results):
     plt.tight_layout()
     plt.savefig(os.path.join(folder, "Final Results"))
     plt.clf()
+

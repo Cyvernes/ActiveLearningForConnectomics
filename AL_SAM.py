@@ -20,17 +20,17 @@ from data_tools import *
 
 # Learner parameters
 LEARNER_TYPE = "Pseudo Active Learning"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
-STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
-LEARNING_STRATEGIES = [oneSeedForOneMaskLS]
-# {basicLS, oneSeedForOneMaskLS, oneSeedForOneMaskLSWithDropOut}
-FIRST_SEEDS_SELECTOR = allForegroundSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
-SEED_SELECTION_STRATEGIES = [ArgmaxForegroundProbability] # {ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
+STRATEGY_SELECTOR = changeGivenAmountOfSeenMito  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
+LEARNING_STRATEGIES = [FewSeedsForOneMaskLS]  # {basicLS, oneSeedForOneMaskLS, oneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
+FIRST_SEEDS_SELECTOR = popLastSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
+SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxForegroundProbability]  # {ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH  # {uncertaintyH, uncertaintyKL}
-FILTERING_FUNCTION = HybridGDFKS_hard  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard}
+FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard, HybridGDFKS_Dist}
 FILTERING_AUX_FONCTION = NotInMasksFromOneSeedOneMask  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromOneSeedOneMask}
+
 USE_PREVIOUS_LOGITS = False  # change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
 USE_BUDGET = True
-ANNOTATION_BUDGET = 100
+ANNOTATION_BUDGET = 50
 
 # Plots and results parameters
 SAVE_INTERMEDIATE_RESULTS = True
@@ -46,9 +46,7 @@ TRAIN_RATIO = 1
 LOAD_DATA_ONCE_FOR_ALL = True
 CHOOSE_DATA_AT_RANDOM = False
 LOAD_ONE_IMAGE_IN_EACH_FOLDER = False
-FILE_WITH_ALL_LINKS = (
-    "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
-)
+FILE_WITH_ALL_LINKS = "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
 FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/"
 FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/"
 SPECIFIC_IMAGE_LINKS = [
@@ -109,13 +107,9 @@ if __name__ == "__main__":
 
     if LOAD_DATA_ONCE_FOR_ALL:
         print("Loading the data once for all...")
-        train_images = [
-            cv2.imread(images_links[idx])
-            for idx in range(int(TRAIN_RATIO * len(images_links)))
-        ]
+        train_images = [cv2.imread(images_links[idx]) for idx in range(int(TRAIN_RATIO * len(images_links)))]
         test_images = [
-            cv2.imread(images_links[idx])
-            for idx in range(int(TRAIN_RATIO * len(images_links)), len(images_links))
+            cv2.imread(images_links[idx]) for idx in range(int(TRAIN_RATIO * len(images_links)), len(images_links))
         ]
         train_masks = [
             np.any(cv2.imread(masks_links[idx]) != [0, 0, 0], axis=-1)
@@ -133,9 +127,7 @@ if __name__ == "__main__":
     print("Loading the model...")
 
     # Loading model weights
-    sam_checkpoint = (
-        "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
-    )
+    sam_checkpoint = "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
     model_type = "vit_h"
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=device)
@@ -237,9 +229,7 @@ if __name__ == "__main__":
             continue
 
         if SAVE_FIRST_SEED:
-            plotAndSaveImageWithFirstSeed(
-                FOLDER_FOR_INTERMEDIATE_RESULTS, image, first_seeds, idx
-            )
+            plotAndSaveImageWithFirstSeed(FOLDER_FOR_INTERMEDIATE_RESULTS, image, first_seeds, idx)
 
         # Main loop
 
@@ -259,6 +249,7 @@ if __name__ == "__main__":
         nb_annotations = 0
         count = 0
         while nb_annotations < budget:
+            learner.count = count + 1
             input_points += next_seeds
             input_labels += [getLabel(new_seed, GT_mask) for new_seed in next_seeds]
             nb_annotations += len(next_seeds)
@@ -298,7 +289,7 @@ if __name__ == "__main__":
         max_IoU = max(IoUs)
         for i, iou in enumerate(IoUs):
             if iou >= 0.9 * max_IoU:
-                print(f"Used {i} iterations to reach 90% of max IoU")
+                print(f"Used {NBs[i]} annotations to reach 90% of max IoU")
                 break
         if SAVE_UNCERTAINTY_PERCENTILES:
             savePercentilesPlot(FOLDER_FOR_FINAL_RESULTS, NBs, percentiles, idx)
@@ -321,9 +312,9 @@ if __name__ == "__main__":
             images_FNs_at_max_IoU,
             images_nb_seeds,
         )
-    """
-    Testing
-    """
+        """
+        Testing
+        """
     print("-------------------------------------")
     print("Testing...")
     print("Not implemented")

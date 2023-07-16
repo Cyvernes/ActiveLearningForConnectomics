@@ -40,6 +40,8 @@ class ActiveLearningSAM:
         self.need_ground_truth = False
         self.use_previous_logits = use_previous_logits
         self.input_points = []
+        self.seed_subsets = []  # Used by FewSeedsForOneMask
+        self.label_subsets = []  # Used by FewSeedsForOneMask
         self.input_labels = []
         self.evidence = None
         self.current_strategy_idx = 0
@@ -63,6 +65,7 @@ class ActiveLearningSAM:
 
         self.seeds_selection_strategies = seeds_selection_strategies
 
+        self.count = 0 # debug
         # Instancing a mask generator
         if mask_generator:
             self.mask_generator = mask_generator
@@ -79,9 +82,7 @@ class ActiveLearningSAM:
             )
 
         # Instancing a predictor
-        self.predictor = predictor = SamPredictorWithDropOut(
-            self.model, p=0.2, use_dropout=False
-        )
+        self.predictor = predictor = SamPredictorWithDropOut(self.model, p=0.2, use_dropout=False)
 
     def setData(self, image: np.ndarray) -> None:
         self.image = image
@@ -99,19 +100,20 @@ class ActiveLearningSAM:
             return_logits=True,
         )
         self.a_priori = evidence.squeeze()
-        self.masks_from_single_seeds = np.zeros_like(
-            self.a_priori, dtype="uint8")
+        self.masks_from_single_seeds = np.zeros_like(self.a_priori, dtype="int16")
         self.nb_initial_seeds = -1
 
-    # masks from Segment Everything are in the same format as the image
-    def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int, np.ndarray]:
+    def findFirstSeeds(
+        self,
+    ) -> Tuple[
+        List[Tuple[int, int]], int, np.ndarray
+    ]:  # masks from Segment Everything are in the same format as the image
         self.SE_masks = sorted(
             self.mask_generator.generate(self.image),
             key=lambda mask: mask["predicted_iou"],
         )  # masks from segement every thing
         self.SE_Seeds = removeTooCloseSeeds(
-            [swap(findVisualCenter(mask["segmentation"]))
-             for mask in self.SE_masks]
+            [swap(findVisualCenter(mask["segmentation"])) for mask in self.SE_masks]
         )  # SE_seeds are saved in the input format
         nb_seeds = len(self.SE_Seeds)
         self.nb_initial_seeds = nb_seeds
@@ -127,9 +129,7 @@ class ActiveLearningSAM:
         self.current_strategy_idx = self.strategy_selector(self)
         if old_strat != self.current_strategy_idx:
             self.idx_when_strat_has_changed.append(len(input_points))
-        self.learning_strategies[
-            self.current_strategy_idx % len(self.learning_strategies)
-        ](self)
+        self.learning_strategies[self.current_strategy_idx % len(self.learning_strategies)](self)
         self.nb_seed_used = len(self.input_points)
         return self.cp_mask
 
@@ -138,9 +138,9 @@ class ActiveLearningSAM:
         old_strat = self.current_strategy_idx
         if old_strat != self.current_strategy_idx:
             self.idx_when_strat_has_changed.append(len(self.input_points))
-        next_seeds = self.seeds_selection_strategies[
-            self.current_strategy_idx % len(self.seeds_selection_strategies)
-        ](self)
+        next_seeds = self.seeds_selection_strategies[self.current_strategy_idx % len(self.seeds_selection_strategies)](
+            self
+        )
         return next_seeds
 
 
