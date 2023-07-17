@@ -20,10 +20,10 @@ from data_tools import *
 
 # Learner parameters
 LEARNER_TYPE = "Pseudo Active Learning"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
-STRATEGY_SELECTOR = changeGivenAmountOfSeenMito  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
-LEARNING_STRATEGIES = [FewSeedsForOneMaskLS]  # {basicLS, oneSeedForOneMaskLS, oneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
-FIRST_SEEDS_SELECTOR = popLastSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
-SEED_SELECTION_STRATEGIES = [ArgmaxEvInSESeeds, ArgmaxForegroundProbability]  # {ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
+STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
+LEARNING_STRATEGIES = [FewSeedsForOneMaskLS]  # {BasicLS, OneSeedForOneMaskLS, OneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
+FIRST_SEEDS_SELECTOR = allForegroundSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
+SEED_SELECTION_STRATEGIES = [ArgmaxForegroundProbability]  # {ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH  # {uncertaintyH, uncertaintyKL}
 FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard, HybridGDFKS_Dist}
 FILTERING_AUX_FONCTION = NotInMasksFromOneSeedOneMask  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromOneSeedOneMask}
@@ -315,6 +315,4 @@ if __name__ == "__main__":
         """
         Testing
         """
-    print("-------------------------------------")
-    print("Testing...")
-    print("Not implemented")
+ 

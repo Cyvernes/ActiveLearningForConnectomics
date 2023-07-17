@@ -48,7 +48,6 @@ class ActiveLearningSAM:
         self.logits = None
         self.a_priori = None
         self.current_strategy_idx = 0
-        self.learning_strategies = learning_strategies
         self.masks_from_single_seeds = None
         self.idx_when_strat_has_changed = []
         self.nb_seed_used = 0
@@ -82,8 +81,10 @@ class ActiveLearningSAM:
             )
 
         # Instancing a predictor
-        self.predictor = predictor = SamPredictorWithDropOut(self.model, p=0.2, use_dropout=False)
-
+        self.predictor = SamPredictorWithDropOut(self.model, p=0.2, use_dropout=False)
+        self.learning_strategies = [ls(self) for ls in learning_strategies]
+        
+        
     def setData(self, image: np.ndarray) -> None:
         self.image = image
         h, w, _ = image.shape
@@ -129,7 +130,7 @@ class ActiveLearningSAM:
         self.current_strategy_idx = self.strategy_selector(self)
         if old_strat != self.current_strategy_idx:
             self.idx_when_strat_has_changed.append(len(input_points))
-        self.learning_strategies[self.current_strategy_idx % len(self.learning_strategies)](self)
+        self.learning_strategies[self.current_strategy_idx % len(self.learning_strategies)]() #apply the learning strategy
         self.nb_seed_used = len(self.input_points)
         return self.cp_mask
 
@@ -221,33 +222,8 @@ class RandomLearner(ActiveLearningSAM):
 
 
 class PseudoActiveLearningSAM(ActiveLearningSAM):
-    def __init__(
-        self,
-        model,
-        strategy_selector,
-        learning_strategies,
-        first_seeds_selector,
-        seeds_selection_strategies,
-        uncertainty_fn,
-        filtering_fn,
-        filtering_aux_fn,
-        image=None,
-        mask_generator=None,
-        use_previous_logits=True,
-    ):
-        super().__init__(
-            model,
-            strategy_selector,
-            learning_strategies,
-            first_seeds_selector,
-            seeds_selection_strategies,
-            uncertainty_fn,
-            filtering_fn,
-            filtering_aux_fn,
-            image,
-            mask_generator,
-            use_previous_logits,
-        )
+    def __init__(self, model, strategy_selector, learning_strategies, first_seeds_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, filtering_aux_fn, image=None, mask_generator=None, use_previous_logits=True):
+        super().__init__(model, strategy_selector, learning_strategies, first_seeds_selector, seeds_selection_strategies, uncertainty_fn, filtering_fn, filtering_aux_fn, image, mask_generator, use_previous_logits)
         self.GT_mask = None
         self.need_ground_truth = True
 

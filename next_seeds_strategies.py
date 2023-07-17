@@ -4,6 +4,7 @@ from filters import *
 
 
 def ArgmaxEvInSESeeds(learner) -> list:
+    print(learner.SE_Seeds)
     learner.SE_Seeds = sorted(
         learner.SE_Seeds,
         key=lambda x: getValueinArrFromInputFormat(learner.evidence, x),
@@ -47,7 +48,7 @@ def ArgmaxEvidence(learner) -> list:
 
 def ArgmaxForegroundProbability(
     learner,
-) -> list:  # similar to argmax evidence but the metrics is positive so the filters behave correctly
+) -> list:  # similar to argmax evidence but the metrics are positive so the filters behave correctly
     foreground_probability = sigmoid(learner.evidence)
     foreground_probability = learner.filtering_function(learner, foreground_probability)
     cx, cy = np.unravel_index(np.argmax(foreground_probability), foreground_probability.shape)
