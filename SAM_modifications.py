@@ -64,7 +64,9 @@ class SamPredictorWithDropOut(SamPredictor):
             a subsequent iteration as mask input.
         """
         if not self.is_image_set:
-            raise RuntimeError("An image must be set with .set_image(...) before mask prediction.")
+            raise RuntimeError(
+                "An image must be set with .set_image(...) before mask prediction."
+            )
 
         if point_coords is not None:
             points = (point_coords, point_labels)
@@ -95,7 +97,9 @@ class SamPredictorWithDropOut(SamPredictor):
         )
 
         # Upscale the masks to the original image resolution
-        masks = self.model.postprocess_masks(low_res_masks, self.input_size, self.original_size)
+        masks = self.model.postprocess_masks(
+            low_res_masks, self.input_size, self.original_size
+        )
 
         if not return_logits:
             masks = masks > self.model.mask_threshold

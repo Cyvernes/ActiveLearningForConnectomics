@@ -21,16 +21,20 @@ from data_tools import *
 # Learner parameters
 LEARNER_TYPE = "Pseudo Active Learning"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
 STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
-LEARNING_STRATEGIES = [FewSeedsForOneMaskLS]  # {BasicLS, OneSeedForOneMaskLS, OneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
-FIRST_SEEDS_SELECTOR = allForegroundSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning}
-SEED_SELECTION_STRATEGIES = [ArgmaxForegroundProbability]  # {ArgmaxEvInSESeeds, ArgmaxDist, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
+LEARNING_STRATEGIES = [
+    FewSeedsForOneMaskLS
+]  # {BasicLS, OneSeedForOneMaskLS, OneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
+FIRST_SEEDS_SELECTOR = aGivenAmountOfForegroundSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning, aGivenAmountOfForegroundSESeeds}
+SEED_SELECTION_STRATEGIES = [
+    ArgmaxForegroundProbability
+]  # {ArgmaxEvInSESeeds, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH  # {uncertaintyH, uncertaintyKL}
 FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard, HybridGDFKS_Dist}
-FILTERING_AUX_FONCTION = NotInMasksFromOneSeedOneMask  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromOneSeedOneMask}
+FILTERING_AUX_FUNCTION = NotInMasksFromSegmentationStrategy  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromSegmentationStrategy}
 
 USE_PREVIOUS_LOGITS = False  # change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
 USE_BUDGET = True
-ANNOTATION_BUDGET = 50
+ANNOTATION_BUDGET = 80
 
 # Plots and results parameters
 SAVE_INTERMEDIATE_RESULTS = True
@@ -46,25 +50,27 @@ TRAIN_RATIO = 1
 LOAD_DATA_ONCE_FOR_ALL = True
 CHOOSE_DATA_AT_RANDOM = False
 LOAD_ONE_IMAGE_IN_EACH_FOLDER = False
-FILE_WITH_ALL_LINKS = "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
+FILE_WITH_ALL_LINKS = (
+    "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
+)
 FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/"
 FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/"
 SPECIFIC_IMAGE_LINKS = [
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y3072-3584_z1024-1536-LOC-0_254_0-512_0-512.tiff",
+    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/images/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/images/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/images/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/images/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
 ]
 SPECIFIC_MASK_LINKS = [
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/masks/Wei2020_MitoEM-R-ROI-x0-500_y3072-3584_z1024-1536-LOC-0_254_0-512_0-512.tiff",
+    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/masks/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/masks/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/masks/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/masks/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/masks/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
 ]
-SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[3]]
-SPECIFIC_MASK_LINKS = [SPECIFIC_MASK_LINKS[3]]
+SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[0]]
+SPECIFIC_MASK_LINKS = [SPECIFIC_MASK_LINKS[0]]
 
 if __name__ == "__main__":
     """
@@ -107,9 +113,13 @@ if __name__ == "__main__":
 
     if LOAD_DATA_ONCE_FOR_ALL:
         print("Loading the data once for all...")
-        train_images = [cv2.imread(images_links[idx]) for idx in range(int(TRAIN_RATIO * len(images_links)))]
+        train_images = [
+            cv2.imread(images_links[idx])
+            for idx in range(int(TRAIN_RATIO * len(images_links)))
+        ]
         test_images = [
-            cv2.imread(images_links[idx]) for idx in range(int(TRAIN_RATIO * len(images_links)), len(images_links))
+            cv2.imread(images_links[idx])
+            for idx in range(int(TRAIN_RATIO * len(images_links)), len(images_links))
         ]
         train_masks = [
             np.any(cv2.imread(masks_links[idx]) != [0, 0, 0], axis=-1)
@@ -127,7 +137,9 @@ if __name__ == "__main__":
     print("Loading the model...")
 
     # Loading model weights
-    sam_checkpoint = "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
+    sam_checkpoint = (
+        "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
+    )
     model_type = "vit_h"
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=device)
@@ -148,7 +160,7 @@ if __name__ == "__main__":
             SEED_SELECTION_STRATEGIES,
             UNCERTAINTY_FUNCTION_TYPE,
             FILTERING_FUNCTION,
-            FILTERING_AUX_FONCTION,
+            FILTERING_AUX_FUNCTION,
             use_previous_logits=USE_PREVIOUS_LOGITS,
         )
     elif LEARNER_TYPE == "Pseudo Active Learning":
@@ -160,7 +172,7 @@ if __name__ == "__main__":
             SEED_SELECTION_STRATEGIES,
             UNCERTAINTY_FUNCTION_TYPE,
             FILTERING_FUNCTION,
-            FILTERING_AUX_FONCTION,
+            FILTERING_AUX_FUNCTION,
             use_previous_logits=USE_PREVIOUS_LOGITS,
         )
     elif LEARNER_TYPE == "FPFN":
@@ -172,7 +184,7 @@ if __name__ == "__main__":
             SEED_SELECTION_STRATEGIES,
             UNCERTAINTY_FUNCTION_TYPE,
             FILTERING_FUNCTION,
-            FILTERING_AUX_FONCTION,
+            FILTERING_AUX_FUNCTION,
             use_previous_logits=USE_PREVIOUS_LOGITS,
         )
     elif LEARNER_TYPE == "Random":
@@ -184,7 +196,7 @@ if __name__ == "__main__":
             SEED_SELECTION_STRATEGIES,
             UNCERTAINTY_FUNCTION_TYPE,
             FILTERING_FUNCTION,
-            FILTERING_AUX_FONCTION,
+            FILTERING_AUX_FUNCTION,
             use_previous_logits=USE_PREVIOUS_LOGITS,
         )
     else:
@@ -223,13 +235,15 @@ if __name__ == "__main__":
             learner.setGroundTruthMask(GT_mask)
 
         # Find the first seed to query
-        first_seeds, nb_seeds, first_mask = learner.findFirstSeeds()
+        first_seeds, nb_seeds = learner.findFirstSeeds()
         if len(first_seeds) == 0:  # avoid empty list
             print("No first seed was given")
             continue
 
         if SAVE_FIRST_SEED:
-            plotAndSaveImageWithFirstSeed(FOLDER_FOR_INTERMEDIATE_RESULTS, image, first_seeds, idx)
+            plotAndSaveImageWithFirstSeed(
+                FOLDER_FOR_INTERMEDIATE_RESULTS, image, first_seeds, idx
+            )
 
         # Main loop
 
@@ -315,4 +329,3 @@ if __name__ == "__main__":
         """
         Testing
         """
- 

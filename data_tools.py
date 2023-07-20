@@ -1,6 +1,7 @@
 import os
 import glob
 
+
 def retrieveLinksForFolder(config):
     images_links = []
     masks_links = []
@@ -18,6 +19,7 @@ def retrieveLinksForFolder(config):
         masks_links.extend(mask_files)  # Add all mask files to the list
 
     return images_links, masks_links
+
 
 def retrieveLinksForOneImageInEachFolder(config):  # R
     # Retrieve one image from each folder
