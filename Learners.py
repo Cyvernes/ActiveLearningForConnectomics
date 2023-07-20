@@ -25,7 +25,7 @@ class ActiveLearningSAM:
     """
     def __init__(
         self,
-        model : ActiveLearningSAM,
+        model,
         strategy_selector,
         learning_strategies,
         first_seeds_selector,

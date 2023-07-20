@@ -1,8 +1,11 @@
+from __future__ import annotations
 import numpy as np
 from tools import *
 from plot_tools import *
 import scipy.ndimage
-from Learners import ActiveLearningSAM
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from Learners import ActiveLearningSAM
 
 
 def evidenceSmallerOrEqualToZero(learner : ActiveLearningSAM) -> np.ndarray:

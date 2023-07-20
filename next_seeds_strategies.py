@@ -1,9 +1,11 @@
+from __future__ import annotations
 import numpy as np
 from tools import *
 from filters import *
-from Learners import ActiveLearningSAM
-
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from Learners import ActiveLearningSAM
+    
 def ArgmaxEvInSESeeds(learner : ActiveLearningSAM) -> list:
     """This function encodes a sampling strategy.
     The seed of maximum evidence in SE seeds is selected.

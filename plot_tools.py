@@ -1,10 +1,14 @@
+"""This module collects every functions that are use to plot and save data in the project.
+"""
+from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 from tools import *
-from Learners import ActiveLearningSAM
 import scipy.ndimage
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from Learners import ActiveLearningSAM
 
 def savePercentiles(
     learner: ActiveLearningSAM, percentiles_points: list, percentiles: list

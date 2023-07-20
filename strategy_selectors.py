@@ -1,7 +1,9 @@
+from __future__ import annotations
 import numpy as np
 from tools import *
-from Learners import ActiveLearningSAM
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from Learners import ActiveLearningSAM
 
 def singleStrat(learner: ActiveLearningSAM) -> int:
     """This function encodes the trivial strategy choice. It should be used when only one strategy is used. 
