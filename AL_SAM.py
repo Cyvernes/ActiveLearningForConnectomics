@@ -1,3 +1,5 @@
+""" This script can be used to test a learner on a single image
+"""
 import torch
 import torchvision
 import numpy as np

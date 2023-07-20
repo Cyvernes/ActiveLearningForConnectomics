@@ -11,7 +11,6 @@ from segment_anything import sam_model_registry
 import filters
 import first_seeds_selector
 import learning_strategies
-import new_seeds_strategies
 import next_seeds_strategies
 import strategy_selectors
 import tools

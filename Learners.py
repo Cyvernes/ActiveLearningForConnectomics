@@ -127,21 +127,16 @@ class ActiveLearningSAM:
         self.masks_from_single_seeds = np.zeros_like(self.a_priori, dtype="int16")
         self.nb_initial_seeds = -1
 
-    def findFirstSeeds(
-        self,
-    ) -> Tuple[
-        List[Tuple[int, int]], int
-    ]:
-        """This function computes the first seed to be annotaed.
-        Returns:
-            Tuple[ List[Tuple[int, int]], int]: the seeds, the number of seeds available in SE_Seeds
+    def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int]:
+        """this method computes the first to annotate.
 
+        :return: This method returns the list of first seeds to annotate and the number of seeds in SE_seeds
+        :rtype: Tuple[List[Tuple[int, int]], int]
         """
-        # masks from Segment Everything are in the same format as the image
         self.SE_masks = sorted(
             self.mask_generator.generate(self.image),
             key=lambda mask: mask["predicted_iou"],
-        )  # masks from segement every thing
+        )  # masks from Segment Everything are in the same format as the image
         self.SE_Seeds = removeTooCloseSeeds(
             [swap(findVisualCenter(mask["segmentation"])) for mask in self.SE_masks]
         )  # SE_seeds are saved in the input format
