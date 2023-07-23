@@ -9,29 +9,30 @@ if TYPE_CHECKING:
 
 
 def evidenceSmallerOrEqualToZero(learner : ActiveLearningSAM) -> np.ndarray:
-    """This is an auxiliary function for filtering function. It computes the region of interest in filtering.
-    The region of interest is the region of the image in wiche every evidence is smaller or equal to zero.
+    """This is an auxiliary function for filtering function. 
+        It computes the region of interest for filtering.
+        The region of interest is the region of the image in wich the evidence is smaller or equal to zero.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-
-    Returns:
-        np.ndarray: Region of interest
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: Region of interest
+    :rtype: np.ndarray
     """
+
     blob = learner.evidence < 0
     blob = blob.astype("uint8")
     return blob
 
 
 def NotInMasksFromSegmentationStrategy(learner : ActiveLearningSAM) -> np.ndarray:
-    """This is an auxiliary function for filtering function. It computes the region of interest in filtering.
-    The region of interest is the region that is not segmented by the segmentation strategy
+    """This is an auxiliary function for filtering function. 
+        It computes the region of interest for filtering.
+        The region of interest is the region that is not segmented by the segmentation strategy
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-
-    Returns:
-        np.ndarray: Region of interest
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: Region of interest
+    :rtype: np.ndarray
     """
     blob = learner.masks_from_single_seeds <= 0
     blob = blob.astype("uint8")
@@ -39,15 +40,16 @@ def NotInMasksFromSegmentationStrategy(learner : ActiveLearningSAM) -> np.ndarra
 
 
 def threshOnUncertainty(learner : ActiveLearningSAM) -> np.ndarray:
-    """This is an auxiliary function for filtering function. It computes the region of interest in filtering.
-    The region of interest is defined by thresholds on the uncertainty map.
+    """This is an auxiliary function for filtering function. 
+        It computes the region of interest in filtering.
+        The region of interest is defined by thresholds on the uncertainty map.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-
-    Returns:
-        np.ndarray: Region of interest
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: Region of interest
+    :rtype: np.ndarray
     """
+
     min_p_thresh = 0
     max_p_thresh = 0.7
     max_evidence_thresh = np.log(max_p_thresh / (1 - max_p_thresh))
@@ -62,14 +64,14 @@ def threshOnUncertainty(learner : ActiveLearningSAM) -> np.ndarray:
 
 def filterTrivial(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray:
     """This function is a filter. It changes values in the array arr.
-        This filter does not change values in the array.
+        This filter does nothing.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     return arr
 
@@ -78,12 +80,12 @@ def hardFilter(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray:
     """This function is a filter. It changes values in the array arr.
        Every values that are not in the region of interest is set to - infinity.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     blob = learner.filtering_aux_function(learner)
     arr[np.logical_not(blob)] = -np.inf
@@ -95,12 +97,12 @@ def filterWithDist(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray:
        Values are changed accoring to the distance from the border of the region of interest.
        A sigmoid function is applied so that the filter is continuous.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     blob = learner.filtering_aux_function(learner)
     dist = cv2.distanceTransform(blob, cv2.DIST_L2, 3)
@@ -114,12 +116,12 @@ def filterWithDistWithBorder(learner : ActiveLearningSAM, arr: np.ndarray) -> np
        Values are changed accoring to the distance from the border of the region of interest or from the brder of the image.
        A sigmoid function is applied so that the filter is continuous.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     blob = learner.filtering_aux_function(learner)
     a, b = blob.shape
@@ -134,12 +136,12 @@ def filterWithPercentile(learner : ActiveLearningSAM, arr: np.ndarray) -> np.nda
     """This function is a filter. It changes values in the array arr.
        Values greater than the 80th percentile are set to 0
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     percentile_thresh = 80
     arr[arr >= np.percentile(arr, percentile_thresh)] = 0
@@ -150,12 +152,12 @@ def filterWithDistSkeleton(learner : ActiveLearningSAM, arr: np.ndarray) -> np.n
     """This function is a filter. It changes values in the array arr.
        Values are changed accoring to the skeleton of the distance from the border
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     evidence = learner.evidence
     p_thresh = 0.95
@@ -168,13 +170,12 @@ def filterGaussianDistFromKnownSeeds(learner : ActiveLearningSAM, arr: np.ndarra
     """This function is a filter. It changes values in the array arr.
        Values are changed accoring to the gaussian distance from the already annotated points.
 
-
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     filter_arr = np.zeros_like(arr)
     x_coords, y_coords = zip(*learner.input_points)
@@ -190,12 +191,12 @@ def filterDistFromKnownSeeds(learner : ActiveLearningSAM, arr: np.ndarray) -> np
     """This function is a filter. It changes values in the array arr.
        Values are changed accoring to the distance from already annotated points.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     blob = np.ones_like(arr)
     x_coords, y_coords = zip(*learner.input_points)
@@ -209,12 +210,12 @@ def HybridGDFKS_hard(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray
     """This function is a filter. It changes values in the array arr.
        This is an hybrid filter. It calls filterGaussianDistFromKnownSeeds and hardFilter.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     arr = filterGaussianDistFromKnownSeeds(learner, arr)
     arr = hardFilter(learner, arr)
@@ -225,12 +226,12 @@ def HybridDFKS_hard(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray:
     """This function is a filter. It changes values in the array arr.
        This is an hybrid filter. It calls filterDistFromKnownSeeds and hardFilter.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     arr = filterDistFromKnownSeeds(learner, arr)
     arr = hardFilter(learner, arr)
@@ -241,12 +242,12 @@ def HybridGDFKS_Dist(learner : ActiveLearningSAM, arr: np.ndarray) -> np.ndarray
     """This function is a filter. It changes values in the array arr.
        This is an hybrid filter. It calls filterGaussianDistFromKnownSeeds and filterWithDist.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        arr (np.ndarray): Array to be filtered
-
-    Returns:
-        np.ndarray: Filtered array
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param arr: Array to be filtered
+    :type arr: np.ndarray
+    :return: Filtered array
+    :rtype: np.ndarray
     """
     arr = filterGaussianDistFromKnownSeeds(learner, arr)
     arr = filterWithDist(learner, arr)

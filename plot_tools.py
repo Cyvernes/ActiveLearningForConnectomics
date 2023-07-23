@@ -15,11 +15,14 @@ def savePercentiles(
 ) -> None:
     """This auxiliary function computes and saves percentiles at points from percentiles_points into percentiles
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-        percentiles_points (list): list containing all percentiles to be calculated
-        percentiles (list): List in which results are concatenated
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param percentiles_points: List containing all percentiles to be calculated
+    :type percentiles_points: list
+    :param percentiles: List in which results are concatenated
+    :type percentiles: list
     """
+
     uncertainty = learner.uncertainty_function(learner.evidence)
     for i, p in enumerate(percentiles_points):
         percentiles[i].append(np.percentile(uncertainty, p))
@@ -42,19 +45,30 @@ def plotAndSaveIntermediateResults(
     The upper left picture represents the image, seeds and the current mask segmentation.
     Red dots represent background seeds, green dots represent foreground seeds and stars represent next seeds to be annotated with the corresponding color.
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        learner (ActiveLearningSAM): Learner
-        next_seeds (list): Next seeds to be annotated
-        image (np.ndarray): Image
-        GT_mask (np.ndarray): Ground truth mask
-        IoUs (list): List of all IoUs (intersection over union) at each iteration
-        FNs (list): List of all false negatives at each iteration
-        FPs (list): List of all false positives at each iteration
-        i (int): Index of the iteration
-        idx (int): Index of the image in the dataset
-        NBs (list): Number of seeds at each iteration until this one
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :param next_seeds: Next seeds to annotate
+    :type next_seeds: list
+    :param image: Image
+    :type image: np.ndarray
+    :param GT_mask: Ground truth mask
+    :type GT_mask: np.ndarray
+    :param IoUs: List of all IoUs (intersection over union) at each iteration
+    :type IoUs: list
+    :param FNs: List of all false negatives at each iteration
+    :type FNs: list
+    :param FPs: List of all false positives at each iteration
+    :type FPs: list
+    :param i: Index of the iteration
+    :type i: int
+    :param idx: Index of the image in the dataset
+    :type idx: int
+    :param NBs: Number of seeds at each iteration until this one
+    :type NBs: list
     """
+
     title_fontsize = 25
     xtick_fontsize = 20
     ytick_fontsize = 20
@@ -264,12 +278,16 @@ def plotAndSaveImageWithFirstSeed(
 ) -> None:
     """This function plots and saves the image and the first seeds used in the first iteration
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        image (np.ndarray): Image
-        first_seeds (list): First seeds
-        idx (int): Index of the image in the dataset
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param image: Image
+    :type image: np.ndarray
+    :param first_seeds: First seeds
+    :type first_seeds: list
+    :param idx: Index of the image in the dataset
+    :type idx: int
     """
+    
     imagewsem = image.copy()
     plt.imshow(imagewsem)
     plt.title("First seed from this mask (from segment everything)")
@@ -281,15 +299,20 @@ def plotAndSaveImageWithFirstSeed(
 def plotAndSaveImageWithFirstSeedandFirstMask(
     folder: str, image: np.ndarray, first_mask: np.ndarray, first_seeds: list, idx: int
 ) -> None:
-    """This function plots and save the image with the first seeds and the first mask
+    """This function plots and save the image with the first seeds and the first mask 
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        image (np.ndarray): Image
-        first_mask (np.ndarray): First mask
-        first_seeds (list): First seeds
-        idx (int): Index of the image in the dataset
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param image: Image
+    :type image: np.ndarray
+    :param first_mask: First mask
+    :type first_mask: np.ndarray
+    :param first_seeds: First seeds
+    :type first_seeds: list
+    :param idx: Index of the image in the dataset
+    :type idx: int
     """
+
     imagewsem = image.copy()
     imagewsem[first_mask] = 0.7 * image[first_mask] + 0.3 * np.array([75, 0, 125])
     plt.imshow(imagewsem)
@@ -304,12 +327,16 @@ def plotAndSaveImageWithGT(
 ) -> None:
     """This function plots and saves the image with the ground truth mask
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        image (np.ndarray): Image
-        GT_mask (np.ndarray): Ground truth mask
-        idx (int): Index of the image in the dataset
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param image: Image
+    :type image: np.ndarray
+    :param GT_mask: Ground truth mask
+    :type GT_mask: np.ndarray
+    :param idx: Index of the image in the dataset
+    :type idx: int
     """
+
     imagewGT = image.copy()
     imagewGT[GT_mask] = 0.7 * image[GT_mask] + 0.3 * np.array([75, 0, 125])
     plt.imshow(imagewGT)
@@ -321,12 +348,16 @@ def plotAndSaveImageWithGT(
 def plotAndSaveFinalIoUEvolution(folder: str, NBs: list, IoUs: list, idx: int):
     """This function plots the evolution of IoU during the experiment
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        NBs (list): Number of seeds at each iteration
-        IoUs (list): List of all IoUs (intersection over union) at each iteration
-        idx (int): Index of the image in the dataset
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param NBs: Number of seeds at each iteration
+    :type NBs: list
+    :param IoUs: List of all IoUs (intersection over union) at each iteration
+    :type IoUs: list
+    :param idx: Index of the image in the dataset
+    :type idx: int
     """
+
     plt.plot(NBs, IoUs)
     plt.xlabel("Nb of seeds")
     plt.ylabel("IoU")
@@ -337,12 +368,16 @@ def plotAndSaveFinalIoUEvolution(folder: str, NBs: list, IoUs: list, idx: int):
 def savePercentilesPlot(folder: str, NBs: list, percentiles: list, idx: int):
     """This function saves the evolution of percentiles during the experiment
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        NBs (list): Number of seeds at each iteration
-        percentiles (list): Evolution of percentiles during the experiment
-        idx (int): Index of the image in the dataset
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param NBs: Number of seeds at each iteration
+    :type NBs: list
+    :param percentiles: Evolution of percentiles during the experiment
+    :type percentiles: list
+    :param idx: Index of the image in the dataset
+    :type idx: int
     """
+
     for i, history in enumerate(percentiles):
         plt.plot(NBs, history)
     plt.savefig(os.path.join(folder, f"Uncertainty percentiles evolution n°{idx}.png"))
@@ -350,11 +385,12 @@ def savePercentilesPlot(folder: str, NBs: list, percentiles: list, idx: int):
 
 
 def plotAndSave(arr: np.array, name: str):
-    """This function plot and save an image
+    """This function plots and saves an image
 
-    Args:
-        arr (np.array): The image to be plotted
-        name (str): name of the output file
+    :param arr: he image to be plotted
+    :type arr: np.array
+    :param name: Name of the output file
+    :type name: str
     """
     plt.imshow(arr)
     plt.savefig(name)
@@ -364,9 +400,10 @@ def plotAndSave(arr: np.array, name: str):
 def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
     """This function plots and save the aggreagation of results on the whole dataset
 
-    Args:
-        folder (str): Folder in which the figure will be saved
-        aggregated_results (dict): Aggregated results
+    :param folder: Folder in which the figure will be saved
+    :type folder: str
+    :param aggregated_results: Aggregated results
+    :type aggregated_results: dict
     """
 
     fig, axs = plt.subplots(2, 2, figsize=(15, 10))

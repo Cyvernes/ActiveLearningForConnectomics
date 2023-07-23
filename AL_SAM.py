@@ -23,7 +23,7 @@ from data_tools import *
 
 # Learner parameters
 LEARNER_TYPE = "Pseudo Active Learning"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
-STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterAGivenAmountOfSeed, changeGivenAmountOfSeenMito}
+STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterASpecificNumberOfSeed, changeAfterASpecificNumberOfSeenMito}
 LEARNING_STRATEGIES = [
     FewSeedsForOneMaskLS
 ]  # {BasicLS, OneSeedForOneMaskLS, OneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}

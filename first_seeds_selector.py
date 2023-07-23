@@ -5,14 +5,13 @@ from Learners import ActiveLearningSAM
 
 def popLastSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
-    The last seed from SE seeds is selected.
-    learner.SE_seeds is updated accordingly.
-    
-    Args:
-        learner (ActiveLearningSAM): Learner
+        The last seed from SE seeds is selected.
+        learner.SE_seeds is updated accordingly.
 
-    Returns:
-        List[Tuple[int, int]]:List of first points to annotate.
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: List of first points to annotate.
+    :rtype: List[Tuple[int, int]]
     """
     SE_mask = learner.SE_masks.pop(-1)["segmentation"]
     first_seed = learner.SE_Seeds.pop(-1)
@@ -21,14 +20,10 @@ def popLastSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 
 def allSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
-    All SE seeds are selected.
-    learner.SE_seeds is updated accordingly.
-    
-    Args:
-        learner (ActiveLearningSAM): Learner
+        All SE seeds are selected.
+        learner.SE_seeds is updated accordingly.
 
-    Returns:
-        List[Tuple[int, int]]:List of first points to annotate.
+
     """
     SE_mask = learner.SE_masks.pop(-1)["segmentation"]
     first_seeds = learner.SE_Seeds
@@ -38,14 +33,13 @@ def allSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 
 def allForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
-    All foreground SE seeds are selected.
-    learner.SE_seeds is updated accordingly.
+        All foreground SE seeds are selected.
+        learner.SE_seeds is updated accordingly.
 
-    Args:
-        learner (ActiveLearningSAM): Learner
-
-    Returns:
-        List[Tuple[int, int]]:List of first points to annotate.
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: List of first points to annotate.
+    :rtype: List[Tuple[int, int]]
     """
     assert (
         learner.need_ground_truth
@@ -64,14 +58,13 @@ def allForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 
 def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
-    A specific number of foreground SE seeds is selected.
-    learner.SE_seeds is updated accordingly.
+        A specific number of foreground SE seeds is selected.
+        learner.SE_seeds is updated accordingly.
     
-    Args:
-        learner (ActiveLearningSAM): Learner
-
-    Returns:
-        List[Tuple[int, int]]:List of first points to annotate.
+    :param learner: Learner
+    :type learner: ActiveLearningSAM
+    :return: List of first points to annotate.
+    :rtype: List[Tuple[int, int]]
     """
     amount = 4
     assert (

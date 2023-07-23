@@ -11,11 +11,10 @@ from typing import Tuple
 def removeTooCloseSeeds(seeds: list) -> list:
     """This function remove points that are too close from each other, i.e. points whose distance is less than 10
 
-    Args:
-        seeds (list): List of points to process
-
-    Returns:
-        list: Processed list
+    :param seeds: ist of points to process
+    :type seeds: list
+    :return: Processed list
+    :rtype: list
     """
 
     points_that_need_to_be_deleted = []
@@ -30,11 +29,10 @@ def removeTooCloseSeeds(seeds: list) -> list:
 def centroid(mask: np.ndarray) ->  Tuple[int, int]:
     """Computes the centroid of a mask
 
-    Args:
-        mask (np.ndarray): Mask
-
-    Returns:
-        Tuple[int, int]: Centroid of the mask
+    :param mask: Mask
+    :type mask: np.ndarray
+    :return: Centroid of the mask
+    :rtype: Tuple[int, int]
     """
 
     a, b = np.where(mask)
@@ -44,11 +42,10 @@ def centroid(mask: np.ndarray) ->  Tuple[int, int]:
 def swap(t: list) -> list:
     """Swap coordinates of a point
 
-    Args:
-        t (list): Point
-
-    Returns:
-        list: Swaped coordiantes
+    :param t: Point
+    :type t: list
+    :return: Swaped coordinates
+    :rtype: list
     """
     return [t[1], t[0]]
 
@@ -56,12 +53,12 @@ def swap(t: list) -> list:
 def IoU(mask1: np.ndarray, mask2: np.ndarray) -> float:
     """Computes the Intersection over Union of two masks.
 
-    Args:
-        mask1 (np.ndarray): Mask 1
-        mask2 (np.ndarray): Mask 2
-
-    Returns:
-        float: Intersection ocer Union
+    :param mask1: Mask 1
+    :type mask1: np.ndarray
+    :param mask2: Mask 2
+    :type mask2: np.ndarray
+    :return: Intersection over Union
+    :rtype: float
     """
     intersection = np.sum(np.bitwise_and(mask1, mask2))
     union = np.sum(np.bitwise_or(mask1, mask2))
@@ -71,12 +68,12 @@ def IoU(mask1: np.ndarray, mask2: np.ndarray) -> float:
 def FP(mask1: np.ndarray, mask2: np.ndarray) -> float:
     """Computes the rate of false poitive according to mask2
 
-    Args:
-        mask1 (np.ndarray): Mask
-        mask2 (np.ndarray): Ground truth
-
-    Returns:
-        float: False positive rate
+    :param mask1: Mask
+    :type mask1: np.ndarray
+    :param mask2: ground Truth
+    :type mask2: np.ndarray
+    :return: False positive rate
+    :rtype: float
     """
     h, w = mask1.shape
     sum = np.sum(np.logical_and(np.bitwise_xor(mask1, mask2), mask1))
@@ -86,12 +83,12 @@ def FP(mask1: np.ndarray, mask2: np.ndarray) -> float:
 def FN(mask1: np.ndarray, mask2: np.ndarray) -> float:
     """Computes the rate of false negative according to mask2
 
-    Args:
-        mask1 (np.ndarray): Mask
-        mask2 (np.ndarray): Ground truth
-
-    Returns:
-        float: False negative rate
+    :param mask1: Mask
+    :type mask1: np.ndarray
+    :param mask2: Ground truth
+    :type mask2: np.ndarray
+    :return: False negative rate
+    :rtype: float
     """
     h, w = mask1.shape
     sum = np.sum(np.logical_and(np.bitwise_xor(mask1, mask2), mask2))
@@ -102,14 +99,15 @@ def getLabel(
     seed: Tuple[int, int], GT_mask: np.ndarray
 ) -> bool: 
     """Retrieves the label of a point
-    Seeds are given in the prompt format. That's why coordinates are swaped to get the label in the GT format.
+        Seeds are given in the prompt format. 
+        That's why coordinates are swaped to get the label in the GT format.
 
-    Args:
-        seed (Tuple[int, int]): Seed
-        GT_mask (np.ndarray): Ground truth mask
-
-    Returns:
-        bool: label of the mask
+    :param seed: Seed
+    :type seed: Tuple[int, int]
+    :param GT_mask: Ground truth mask
+    :type GT_mask: np.ndarray
+    :return: Label of the seed
+    :rtype: bool
     """
     return GT_mask[seed[1], seed[0]]
 
@@ -117,14 +115,15 @@ def getLabel(
 def getValueinArrFromInputFormat(
     arr: np.ndarray, seed: Tuple[int, int]
 ): 
-    """Retrieves the value of a point in the array. The point is supposed to be given in the prompt format.
+    """Retrieves the value of a point in the array. 
+        The point is supposed to be given in the prompt format.
 
-    Args:
-        arr (np.ndarray): Array in which to retrieve the value
-        seed (Tuple[int, int]): Coordinates
-
-    Returns:
-        _type_: Value of the point in the array.
+    :param arr: Array in which to retrieve the value
+    :type arr: np.ndarray
+    :param seed: Coordinates
+    :type seed: Tuple[int, int]
+    :return: Value of the point in the array.
+    :rtype: _type_
     """
     return arr[seed[1], seed[0]]
 
@@ -132,24 +131,21 @@ def getValueinArrFromInputFormat(
 def sigmoid(x : np.ndarray) -> np.ndarray:
     """Computes the sigmoid of an array.
 
-    Args:
-        x (np.ndarray): array
-
-    Returns:
-        np.ndarray: sigmoid(array)
+    :param x: array
+    :type x: np.ndarray
+    :return: sigmoid(array)
+    :rtype: np.ndarray
     """
     return 1 / (1 + np.exp(-x))
 
 
 def findVisualCenter(mask: np.ndarray) -> Tuple[int, int]:
     """Computes the visual center of a mask.
-    The visual center is computed using a dist transform
 
-    Args:
-        mask (np.ndarray): mask
-
-    Returns:
-        Tuple[int, int]: visual center of the mask
+    :param mask: Mask
+    :type mask: np.ndarray
+    :return: Visual center of the mask
+    :rtype: Tuple[int, int]
     """
     new_mask = mask.copy().astype("uint8")
     a, b = new_mask.shape
@@ -160,13 +156,12 @@ def findVisualCenter(mask: np.ndarray) -> Tuple[int, int]:
 
 def uncertaintyKL(Ev : np.ndarray) -> np.ndarray:
     """Computes the uncertainty of an array.
-    The uncertainty function comes from the Kullback-Leibler divergence.
+        The uncertainty function comes from the Kullback-Leibler divergence.
 
-    Args:
-        Ev (np.ndarray): Evidence map
-
-    Returns:
-        np.ndarray: Uncertainty map
+    :param Ev: Evidence map
+    :type Ev: np.ndarray
+    :return: Uncertainty map
+    :rtype: np.ndarray
     """
     abs_Ev = np.abs(Ev)
     return np.log(1 + np.exp(-abs_Ev))
@@ -174,13 +169,12 @@ def uncertaintyKL(Ev : np.ndarray) -> np.ndarray:
 
 def uncertaintyH(Ev):
     """Computes the uncertainty of an array.
-    The uncertainty function comes from the binary entropy.
+        The uncertainty function comes from the binary entropy.
 
-    Args:
-        Ev (np.ndarray): Evidence map
-
-    Returns:
-        np.ndarray: Uncertainty map
+    :param Ev: Evidence map
+    :type Ev: _type_
+    :return: Uncertainty map
+    :rtype: _type_
     """
     p = sigmoid(Ev)
     one_minus_p = 1 - p
@@ -200,14 +194,16 @@ def UncertaintyPathDist(
     """Computes the uncertainty path distance of an uncertainty map
     Might be very slow and does not use filtering auxiliary function to compute the region of interest.
 
-    Args:
-        uncertainty (np.ndarray): uncertainty map
-        evidence (np.ndarray): evidence map
-        thresh (float): Threshold for the region of interest
-
-    Returns:
-        np.ndarray: _description_
+    :param uncertainty: Uncertainty map
+    :type uncertainty: np.ndarray
+    :param evidence: Evidence map
+    :type evidence: np.ndarray
+    :param thresh:  Threshold for the region of interest
+    :type thresh: float
+    :return: Uncertainty path distance map
+    :rtype: np.ndarray
     """
+
     uncertain_mask = uncertainty > thresh
     uncertain_mask = evidence < thresh
     certain_mask = np.logical_not(uncertain_mask)
@@ -268,13 +264,12 @@ def UncertaintyPathDist(
 
 def skeleton(mask: np.ndarray) -> np.ndarray:
     """Computes the skeleton of a mask
-    This is done thaks to dist transform and laplacian analysis
+        This is done thaks to dist transform and laplacian analysis
 
-    Args:
-        mask (np.ndarray): Mask
-
-    Returns:
-        np.ndarray: Skeleton of the mask
+    :param mask: Mask
+    :type mask: np.ndarray
+    :return: Skeleton of the mask
+    :rtype: np.ndarray
     """
     mask = mask.astype("uint8")
     a, b = mask.shape

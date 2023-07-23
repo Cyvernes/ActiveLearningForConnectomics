@@ -15,10 +15,10 @@ class BasicLS:
     
     """
     def __init__(self, learner : ActiveLearningSAM) -> None:
-        """Constructot of the class
+        """Constructor of the class
 
-        Args:
-            learner (ActiveLearningSAM): Learner
+        :param learner: Learner
+        :type learner: ActiveLearningSAM
         """
         self.learner = learner
         self.use_dropout = False
@@ -74,16 +74,13 @@ class BasicLS:
 
 class OneSeedForOneMaskLS(BasicLS):
     """SAM is better to segment single and isolated object.
-    This learning strategy implements a segmentation strategy that take advantage of this observation.
-
-    Args:
-        BasicLS (_type_): Basic class for every learning strategy
+        This learning strategy implements a segmentation strategy that take advantage of this observation.
     """
     def __init__(self, learner : ActiveLearningSAM) -> None:
         """Constructor of the class
 
-        Args:
-            learner (ActiveLearningSAM): Learner
+        :param learner: Learner
+        :type learner: ActiveLearningSAM
         """
         self.learner = learner
         self.use_dropout = False
@@ -118,11 +115,9 @@ class OneSeedForOneMaskLS(BasicLS):
 
 class OneSeedForOneMaskLSWithDropOut(OneSeedForOneMaskLS):
     """SAM is better to segment single and isolated object.
-    This learning strategy implements a segmentation strategy that take advantage of this observation.
-    This strategy uses drop out to reduce the overconfidence of the model.
+        This learning strategy implements a segmentation strategy that take advantage of this observation.
+        This strategy uses drop out to reduce the overconfidence of the model.
 
-    Args:
-        BasicLS (_type_): Basic class for every learning strategy
     """
     def __init__(self, learner : ActiveLearningSAM) -> None:
         super().__init__(learner)
@@ -164,14 +159,10 @@ class OneSeedForOneMaskLSWithDropOut(OneSeedForOneMaskLS):
 class FewSeedsForOneMaskLS(OneSeedForOneMaskLS):
     """This learning strategy is similar to OneSeedForOneMaskLS but segmentation errors can be fixed by the annoatation.
 
-    Args:
-        OneSeedForOneMaskLS (_type_): _description_
     """
     def __init__(self, learner : ActiveLearningSAM) -> None:
         """Contructor of the class
 
-        Args:
-            learner (ActiveLearningSAM): Learner
         """
         super().__init__(learner)
 
