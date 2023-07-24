@@ -139,7 +139,7 @@ class ActiveLearningSAM:
         self.nb_initial_seeds = -1
 
     def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int]:
-        """this method computes the first to annotate.
+        """This method computes the first points to annotate.
 
         :return: This method returns the list of first seeds to annotate and the number of seeds in SE_seeds
         :rtype: Tuple[List[Tuple[int, int]], int]
