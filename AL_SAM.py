@@ -1,4 +1,5 @@
-""" This script can be used to test a learner on a single image
+""" The purpose of this script is to facilitate learner testing on individual images. 
+By utilizing this script, users can efficiently evaluate the performance of their learners or models on specific input images.
 """
 import torch
 import torchvision

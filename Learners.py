@@ -20,8 +20,9 @@ from typing import List, Tuple
 
 
 class ActiveLearningSAM:
-    """This is the basic class for the active Learning for Connectomics project.
-    This class can't access Ground Truth
+    """This is the fundamental class for the active Learning for Connectomics project.
+        Please note that this class does not have direct access to Ground Truth data. 
+        Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.
     """
     def __init__(
         self,
@@ -114,8 +115,12 @@ class ActiveLearningSAM:
         self.learning_strategies = [ls(self) for ls in learning_strategies]
 
     def setData(self, image: np.ndarray) -> None:
-        """Load the image into the learner
-        Many attributes are reinitialised
+        """Load the image data into the learner and initialize attributes.
+        
+        This method prepares the learner for segmentation by loading the input image data
+        and initializing relevant attributes. Upon calling this method, several attributes
+        are reinitialized to facilitate the segmentation process.
+        
         :param image: Image to segment
         :type image: np.ndarray
         """
