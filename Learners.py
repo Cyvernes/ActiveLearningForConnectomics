@@ -261,7 +261,7 @@ class FPFNLearner(ActiveLearningSAM):
         """
         self.GT_mask = mask.astype("uint8")
 
-    def findNextSeed(self) -> list:
+    def findNextSeeds(self) -> list:
         """Samples next seed using the false positive pixels and the false negative pixels.
 
         :return: Next seed to annotate (in a list)
@@ -328,7 +328,7 @@ class RandomLearner(ActiveLearningSAM):
         )
         random.seed(0)  # select seed for pseudo random generator
 
-    def findNewSeed(self) -> np.ndarray:
+    def findNextSeeds(self) -> np.ndarray:
         """Samples next seed using the false positive pixels and the false negative pixels.
 
         :return: Next seed to annotate (in a list)
