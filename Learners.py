@@ -21,8 +21,9 @@ from typing import List, Tuple
 
 class ActiveLearningSAM:
     """This is the fundamental class for the active Learning for Connectomics project.
-        Please note that this class does not have direct access to Ground Truth data. 
-        Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.
+    
+    Please note that this class does not have direct access to Ground Truth data. 
+    Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.
     """
     def __init__(
         self,
