@@ -144,9 +144,13 @@ class ActiveLearningSAM:
         self.nb_initial_seeds = -1
 
     def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int]:
-        """This method computes the first points to annotate.
-
-        :return: This method returns the list of first seeds to annotate and the number of seeds in SE_seeds
+        """Compute the first points to annotate.    
+        
+        This method calls the initial seed selection process usually based on the Segment Everything (SE)
+        approach. It generates a list of first seeds for annotation and computes the number of seeds
+        available for annotation in the SE_Seeds list.
+    
+        :return: A tuple containing the list of first seeds to annotate and the total number of seeds available in the SE_Seeds list.
         :rtype: Tuple[List[Tuple[int, int]], int]
         """
         self.SE_masks = sorted(
@@ -164,9 +168,11 @@ class ActiveLearningSAM:
         return (first_seeds, nb_seeds)
 
     def learn(self, input_points: list, input_labels: list) -> np.ndarray:
-        """Implements an iteration of active learning
-        New seeds are used to improve the segmentation.
-        The evidence and uncertainty map are updated
+        """Implements an iteration of active learning to improve segmentation.
+        
+        This method represents a single iteration of the active learning process, where new seeds
+        (input_points) and their corresponding labels (input_labels) are used to enhance the
+        segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.
 
         :param input_points: Input seeds
         :type input_points: list
@@ -181,14 +187,16 @@ class ActiveLearningSAM:
         self.current_strategy_idx = self.strategy_selector(self)
         if old_strat != self.current_strategy_idx:
             self.idx_when_strat_has_changed.append(len(input_points))
-        self.learning_strategies[self.current_strategy_idx % len(self.learning_strategies)]()  # apply the learning strategy
+            
+        # apply the selected learning strategy
+        self.learning_strategies[self.current_strategy_idx % len(self.learning_strategies)]()  
         self.nb_seed_used = len(self.input_points)
         return self.cp_mask
 
     def findNextSeeds(self) -> list:
-        """Uses the evidence map and the uncertainty map to sample the next seed to annotate.
+        """Uses the evidence map and uncertainty map to sample the next seed for annotation.
 
-        :return: Next seeds to annotate
+        :return: The next seeds (points) to annotate based on the selected strategy.
         :rtype: list
         """
 
