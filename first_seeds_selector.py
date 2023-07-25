@@ -6,6 +6,7 @@ from Learners import ActiveLearningSAM
 def popLastSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         The last seed from SE seeds is selected.
+        
         learner.SE_seeds is updated accordingly.
 
     :param learner: Learner
@@ -21,6 +22,7 @@ def popLastSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 def allSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         All SE seeds are selected.
+        
         learner.SE_seeds is updated accordingly.
 
 
@@ -34,6 +36,7 @@ def allSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 def allForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         All foreground SE seeds are selected.
+        
         learner.SE_seeds is updated accordingly.
 
     :param learner: Learner
@@ -59,6 +62,7 @@ def allForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         A specific number of foreground SE seeds is selected.
+        
         learner.SE_seeds is updated accordingly.
     
     :param learner: Learner
@@ -81,6 +85,7 @@ def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[i
 def aGivenAmountOfSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         A specific number of SE seeds is selected.
+        
         learner.SE_seeds is updated accordingly.
     
     :param learner: Learner
