@@ -7,7 +7,7 @@
     "SEED_SELECTION_STRATEGIES": ["ArgmaxForegroundProbability"],
     "UNCERTAINTY_FUNCTION_TYPE": "uncertaintyH",
     "FILTERING_FUNCTION": "HybridGDFKS_hard",
-    "FILTERING_AUX_FONCTION": "NotInMasksFromOneSeedOneMask",
+    "FILTERING_AUX_FONCTION": "NotInMasksFromSegmentationStrategy",
     "USE_PREVIOUS_LOGITS": false
   },
   "training_parameters": {

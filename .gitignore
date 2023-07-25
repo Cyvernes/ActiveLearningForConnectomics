@@ -5,3 +5,5 @@ sam_vit_h_4b8939.pth
 .vscode/settings.json
 runscript.sh
 docs/
+batch_output/
+config/

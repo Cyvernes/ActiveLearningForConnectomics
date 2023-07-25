@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 from tools import *
 import scipy.ndimage
+from datetime import datetime
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Learners import ActiveLearningSAM
@@ -440,5 +441,6 @@ def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
 
     # Add spacing between plots
     plt.tight_layout()
-    plt.savefig(os.path.join(folder, "Final Results"))
+    current_datetime = str(datetime.now().strftime("%m:%d:%H:%M:%S"))
+    plt.savefig(os.path.join(folder, f"Final Results {current_datetime}.png"))
     plt.clf()
