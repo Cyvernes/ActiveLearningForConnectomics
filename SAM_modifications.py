@@ -13,9 +13,14 @@ class SamPredictorWithDropOut(SamPredictor):
         self.dropout = torch.nn.Dropout(p=p)
         self.use_dropout = use_dropout
 
-    def setDropOutParameter(self, p):
-        self.p = p
-        self.dropout.p = p
+    def setDropOutParameter(self, p : float) -> None:
+      """Method that sets the dropout parameter of the predictor.
+
+      :param p: New dropout rate
+      :type p: flaot
+      """
+      self.p = p
+      self.dropout.p = p
 
     @torch.no_grad()
     def predict_torch(
@@ -27,8 +32,8 @@ class SamPredictorWithDropOut(SamPredictor):
         multimask_output: bool = True,
         return_logits: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """
-        This method is the same than the original SamPredictor
+        """This method is the same than the original SamPredictor besides that a dropout layer is used on the image encoding.
+        
         Predict masks for the given input prompts, using the currently set image.
         Input prompts are batched torch tensors and are expected to already be
         transformed to the input frame using ResizeLongestSide.
