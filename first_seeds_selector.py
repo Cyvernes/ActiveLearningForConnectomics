@@ -63,6 +63,8 @@ def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[i
     """This function encodes a strategy to find the first point to annotate.
         A specific number of foreground SE seeds is selected.
         
+        If there is not enough foreground seeds from SE_Seeds, then all forground SE_Seeds are selected.
+        
         learner.SE_seeds is updated accordingly.
     
     :param learner: Learner
@@ -85,6 +87,8 @@ def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[i
 def aGivenAmountOfSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         A specific number of SE seeds is selected.
+        
+        If there is not enough points in SE_Seeds, then all SE_Seeds are selected.
         
         learner.SE_seeds is updated accordingly.
     
