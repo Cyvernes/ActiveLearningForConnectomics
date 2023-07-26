@@ -64,6 +64,19 @@ def IoU(mask1: np.ndarray, mask2: np.ndarray) -> float:
     union = np.sum(np.bitwise_or(mask1, mask2))
     return intersection / union
 
+def DiceLoss(mask1: np.ndarray, mask2: np.ndarray) -> float:
+    """Computes the dice loss of two masks.
+
+    :param mask1: Mask 1
+    :type mask1: np.ndarray
+    :param mask2: Mask 2
+    :type mask2: np.ndarray
+    :return: Dice loss 
+    :rtype: float
+    """
+    intersection = np.sum(np.bitwise_and(mask1, mask2))
+    denominator = np.sum(mask1) + np.sum(mask2)
+    return 2*intersection / denominator
 
 def FP(mask1: np.ndarray, mask2: np.ndarray) -> float:
     """Computes the rate of false poitive according to mask2

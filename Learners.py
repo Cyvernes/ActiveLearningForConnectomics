@@ -1,26 +1,31 @@
+import json
+import os
+import random
+import sys
+import time
+import warnings
+from typing import List, Tuple
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torchvision
-import numpy as np
-import cv2
-import sys
-import json
-import time
-import os
-from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
-import random
-import matplotlib.pyplot as plt
-import warnings
-from tools import *
-from plot_tools import *
+from segment_anything import (SamAutomaticMaskGenerator, SamPredictor,
+                              sam_model_registry)
+
 from filters import *
-from strategy_selectors import *
 from next_seeds_strategies import *
+from plot_tools import *
 from SAM_modifications import SamPredictorWithDropOut
-from typing import List, Tuple
+from strategy_selectors import *
+from tools import *
+
 
 
 class ActiveLearningSAM:
     """This is the fundamental class for the active Learning for Connectomics project.
+    This class should be used for every active learner that need not access ground truth.
     
     Please note that this class does not have direct access to Ground Truth data. 
     Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.
@@ -147,7 +152,7 @@ class ActiveLearningSAM:
     def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int]:
         """Compute the first points to annotate.    
         
-        This method calls the initial seed selection process usually based on the Segment Everything (SE)
+        This method calls the initial seed selection process (first_seeds_selector) usually based on the Segment Everything (SE)
         approach. It generates a list of first seeds for annotation and computes the number of seeds
         available for annotation in the SE_Seeds list.
     
@@ -174,6 +179,8 @@ class ActiveLearningSAM:
         This method represents a single iteration of the active learning process, where new seeds
         (input_points) and their corresponding labels (input_labels) are used to enhance the
         segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.
+        The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
+        The corresponding strategy, modulo the number of strategies,in learning_strategies is used.
 
         :param input_points: Input seeds
         :type input_points: list
