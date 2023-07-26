@@ -65,7 +65,7 @@ def IoU(mask1: np.ndarray, mask2: np.ndarray) -> float:
     return intersection / union
 
 def DiceLoss(mask1: np.ndarray, mask2: np.ndarray) -> float:
-    """Computes the dice loss of two masks.
+    """Computes the Dice loss of two masks.
 
     :param mask1: Mask 1
     :type mask1: np.ndarray

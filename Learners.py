@@ -34,9 +34,9 @@ class ActiveLearningSAM:
         self,
         model,
         strategy_selector,
-        learning_strategies,
+        learning_strategies : list,
         first_seeds_selector,
-        seeds_selection_strategies,
+        seeds_selection_strategies : list,
         uncertainty_fn,
         filtering_fn,
         filtering_aux_fn,
@@ -46,28 +46,28 @@ class ActiveLearningSAM:
     ) -> None:
         """Constructor of the ActiveLearningSAM class
 
-        :param model: Model used in segmentation (usually it's SAM)
+        :param model: Model used in segmentation (usually it's SAM).
         :type model: _type_
-        :param strategy_selector: Function that selects wich strategy will be used
+        :param strategy_selector: Function that selects wich strategy will be used.
         :type strategy_selector: _type_
-        :param learning_strategies: Every learning strategies that will be used during the experiment
-        :type learning_strategies: _type_
-        :param first_seeds_selector: Function that selects the first points to annotate
+        :param learning_strategies: List of learning strategies to be used during the experiment.
+        :type learning_strategies: list
+        :param first_seeds_selector: Function that selects the first points to annotate.
         :type first_seeds_selector: _type_
-        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment
-        :type seeds_selection_strategies: _type_
-        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map
+        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.
+        :type seeds_selection_strategies: list
+        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.
         :type uncertainty_fn: _type_
-        :param filtering_fn: Function used as a filter during sampling of the next seeds
+        :param filtering_fn: Function used as a filter during the sampling of the next seeds.
         :type filtering_fn: _type_
-        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter
+        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.
         :type filtering_aux_fn: _type_
-        :param image: Image to segment, defaults to None
-        :type image: _type_, optional
-        :param mask_generator: Automatic mask generator, defaults to None
+        :param image: Image to segment, defaults to None.
+        :type image: np.ndarray, optional
+        :param mask_generator: Automatic mask generator, defaults to None.
         :type mask_generator: _type_, optional
-        :param use_previous_logits: _description_, defaults to True
-        :type use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, optional
+        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.
+        :type use_previous_logits: bool, optional
         """
 
         self.model = model
@@ -179,8 +179,9 @@ class ActiveLearningSAM:
         This method represents a single iteration of the active learning process, where new seeds
         (input_points) and their corresponding labels (input_labels) are used to enhance the
         segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.
+        
         The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
-        The corresponding strategy, modulo the number of strategies,in learning_strategies is used.
+        If the strategy index is greater than the number of strategies in learning_strategies, then the strategy is selected modulo the number of available strategies.
 
         :param input_points: Input seeds
         :type input_points: list
@@ -202,8 +203,11 @@ class ActiveLearningSAM:
         return self.cp_mask
 
     def findNextSeeds(self) -> list:
-        """Uses the evidence map and uncertainty map to sample the next seed for annotation.
-
+        """Uses the evidence map and uncertainty map to sample the next seeds for annotation.
+        
+        The sampling strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
+        If the strategy index is greater than the number of strategies in seeds_selection_strategies, then the strategy is selected modulo the number of available strategies.
+        
         :return: The next seeds (points) to annotate based on the selected strategy.
         :rtype: list
         """
@@ -219,7 +223,9 @@ class ActiveLearningSAM:
 
 
 class FPFNLearner(ActiveLearningSAM):
-    """This class is not an active learner. Seeds are selected accoring to the most arrorous point.
+    """This class is not an active learner because it can access ground truth.
+    It has been implemented to compare active learners to other type of learners.
+    Seeds are selected based on false positive and false negative pixels.
     """
     def __init__(
         self,
@@ -234,56 +240,61 @@ class FPFNLearner(ActiveLearningSAM):
         mask_generator=None,
         use_previous_logits=True,
     ):
-        """Constructor of the FPFNLearner class
+        """Constructor of the FPFNLearner class.
 
-        :param model: Model used in segmentation (usually it's SAM)
+        :param model: Model used in segmentation (usually it's SAM).
         :type model: _type_
-        :param strategy_selector: Function that selects wich strategy will be used
+        :param strategy_selector: Function that selects wich strategy will be used.
         :type strategy_selector: _type_
-        :param learning_strategies: Every learning strategies that will be used during the experiment
-        :type learning_strategies: _type_
-        :param first_seeds_selector: Function that selects the first points to annotate
+        :param learning_strategies: List of learning strategies to be used during the experiment.
+        :type learning_strategies: list
+        :param first_seeds_selector: Function that selects the first points to annotate.
         :type first_seeds_selector: _type_
-        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment
-        :type seeds_selection_strategies: _type_
-        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map
+        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.
+        :type seeds_selection_strategies: list
+        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.
         :type uncertainty_fn: _type_
-        :param filtering_fn: Function used as a filter during sampling of the next seeds
+        :param filtering_fn: Function used as a filter during the sampling of the next seeds.
         :type filtering_fn: _type_
-        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter
+        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.
         :type filtering_aux_fn: _type_
-        :param image: Image to segment, defaults to None
-        :type image: _type_, optional
-        :param mask_generator: Automatic mask generator, defaults to None
+        :param image: Image to segment, defaults to None.
+        :type image: np.ndarray, optional
+        :param mask_generator: Automatic mask generator, defaults to None.
         :type mask_generator: _type_, optional
-        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True
+        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.
         :type use_previous_logits: bool, optional
         """
         super().__init__(
             model,
-            strategy_selector,
-            learning_strategies,
-            seeds_selection_strategies,
-            uncertainty_fn,
-            filtering_fn,
-            filtering_aux_fn,
-            image,
-            mask_generator,
-            use_previous_logits,
+            strategy_selector=None,
+            learning_strategies=[],
+            seeds_selection_strategies=[],
+            uncertainty_fn=None,
+            filtering_fn=None,
+            filtering_aux_fn=None,
+            image=image,
+            mask_generator=mask_decorator,
+            use_previous_logits=False,
         )
         self.GT_mask = None
         self.need_ground_truth = True
     
     def setGroundTruthMask(self, mask: np.ndarray):
-        """Sets the ground truth mask
+        """Sets the ground truth mask.
 
-        :param mask: Ground truth mask
+        :param mask: Ground truth mask.
         :type mask: np.ndarray
         """
         self.GT_mask = mask.astype("uint8")
 
     def findNextSeeds(self) -> list:
-        """Samples next seed using the false positive pixels and the false negative pixels.
+        """Samples the next seed using the false positive and false negative pixels.
+
+        This method selects the next seed (point) for annotation based on the difference between the
+        ground truth mask and the current predicted mask (false positive and false negative pixels).
+        The selected seed aims to target regions with higher segmentation errors for further annotation
+        and improvement.
 
         :return: Next seed to annotate (in a list)
         :rtype: list
@@ -294,7 +305,8 @@ class FPFNLearner(ActiveLearningSAM):
  
 
 class RandomLearner(ActiveLearningSAM):
-    """This class is not an active learner, next seeds are chosen at random
+    """This class is not an active learner<;
+    Seeds are chosen randomly without employing active learning strategies.
     """
     def __init__(
         self,
@@ -310,48 +322,51 @@ class RandomLearner(ActiveLearningSAM):
         use_previous_logits=True,
     ): 
         """Constructor of the RandomLearner class
-        Sampling is done at random
 
-        :param model: Model used in segmentation (usually it's SAM)
+        :param model: Model used in segmentation (usually it's SAM).
         :type model: _type_
-        :param strategy_selector: Function that selects wich strategy will be used
+        :param strategy_selector: Function that selects wich strategy will be used.
         :type strategy_selector: _type_
-        :param learning_strategies: Every learning strategies that will be used during the experiment
-        :type learning_strategies: _type_
-        :param first_seeds_selector: Function that selects the first points to annotate
+        :param learning_strategies: List of learning strategies to be used during the experiment.
+        :type learning_strategies: list
+        :param first_seeds_selector: Function that selects the first points to annotate.
         :type first_seeds_selector: _type_
-        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment
-        :type seeds_selection_strategies: _type_
-        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map
+        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.
+        :type seeds_selection_strategies: list
+        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.
         :type uncertainty_fn: _type_
-        :param filtering_fn: Function used as a filter during sampling of the next seeds
+        :param filtering_fn: Function used as a filter during the sampling of the next seeds.
         :type filtering_fn: _type_
-        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter
+        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.
         :type filtering_aux_fn: _type_
-        :param image: Image to segment, defaults to None
-        :type image: _type_, optional
-        :param mask_generator: Automatic mask generator, defaults to None
+        :param image: Image to segment, defaults to None.
+        :type image: np.ndarray, optional
+        :param mask_generator: Automatic mask generator, defaults to None.
         :type mask_generator: _type_, optional
-        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True
+        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.
         :type use_previous_logits: bool, optional
         """
         super().__init__(
             model,
-            strategy_selector,
-            learning_strategies,
-            seeds_selection_strategies,
-            uncertainty_fn,
-            filtering_fn,
-            filtering_aux_fn,
-            image,
-            mask_generator,
-            use_previous_logits,
+            strategy_selector=None,
+            learning_strategies=[],
+            seeds_selection_strategies=[],
+            uncertainty_fn=None,
+            filtering_fn=None,
+            filtering_aux_fn=None,
+            image=image,
+            mask_generator=mask_generator,
+            use_previous_logits = False,
         )
-        random.seed(0)  # select seed for pseudo random generator
+        random.seed(0)  # Select the seed for the pseudo-random generator to ensure reproducibility.
 
     def findNextSeeds(self) -> np.ndarray:
-        """Samples next seed using the false positive pixels and the false negative pixels.
+        """Samples the next seed using random pixel coordinates within the image.
 
+        This method selects the next seed (point) for annotation by randomly choosing
+        pixel coordinates within the image's dimensions. The selection is independent of
+        segmentation performance or active learning strategies.
+        
         :return: Next seed to annotate (in a list)
         :rtype: list
         """
@@ -361,9 +376,9 @@ class RandomLearner(ActiveLearningSAM):
 
 
 class PseudoActiveLearningSAM(ActiveLearningSAM):
-    """This class is an active Learner but it can acces ground truth. 
-    This allows to simulate specific settings that need to use the ground truth.
-    For instance, giving all foreground points at the beginning can only be done in this class.
+    """This class is an active learner that can access the ground truth.
+    It allows simulating specific settings that need to use the ground truth.
+    For instance, providing all foreground points at the beginning can only be done in this class.
     """
     def __init__(
         self,
@@ -421,9 +436,9 @@ class PseudoActiveLearningSAM(ActiveLearningSAM):
         self.need_ground_truth = True
 
     def setGroundTruthMask(self, mask: np.ndarray) -> None:
-        """Set the ground truth mask
+        """Set the ground truth mask.
 
-        :param mask: Ground truth mask
+        :param mask: Ground truth mask.
         :type mask: np.ndarray
         """
         self.GT_mask = mask.astype("uint8")
