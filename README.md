@@ -40,6 +40,10 @@ This project implements a flexible pipeline to code easily any active learning s
     - An uncertainty strategy that aims to use every annotated points to estimate region of uncertainty and the evidence map (logits).
     - The final prediction strategy that uses the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.
 
+- Some [sampling strategies](https://cyvernes.github.io/AL_Docs/next_seeds_strategies.html#module-next_seeds_strategies) are available. Sampling strategies use the evidence map or the uncertainty map to sample the next points to annotate. Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/next_seeds_strategies.html#module-next_seeds_strategies) to have a description of all sampling strategies natively available.
+
+- Some [strategy selectors](https://cyvernes.github.io/AL_Docs/strategy_selectors.html#module-strategy_selectors) are available. These function computes which learning or sampling strategy should be used at each moment of the learning procedure. Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/strategy_selectors.html) to have a description of all strategy selectors natively available.
+
 ## How to use the pipeline ?
 ### With AL_SAM
 
