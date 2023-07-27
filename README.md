@@ -24,7 +24,7 @@ SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnecto
 
 ## Description of the pipeline
 
-This project implements a flexible pipeline to code easily any active learning strategy for segmentation.The pipeline contains a number of modules that can be used to code a large number of different strategies.
+This project implements a flexible pipeline to code easily any active learning strategy for segmentation.The pipeline contains a number of modules that can be used to code a large number of different learning strategies. For more details a [documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation) is available.
 
 - Four [Learners](https://cyvernes.github.io/AL_Docs/Learners.html#module-Learners) are available: 
     - ActiveLearningSAM: This is the fundamental class for the active Learning for Connectomics project. This class should be used for every active learner that need not access ground truth.
