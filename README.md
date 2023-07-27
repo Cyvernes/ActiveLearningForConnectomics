@@ -52,9 +52,17 @@ PLease refer to the [documentation](https://cyvernes.github.io/AL_Docs/learning_
 
 - Many tools are available. They are used by every module of the pipeline. They provide [data tools](https://cyvernes.github.io/AL_Docs/data_tools.html#module-data_tools), [Visualisation tools](https://cyvernes.github.io/AL_Docs/plot_tools.html#module-plot_tools) and [miscellaneous tools](https://cyvernes.github.io/AL_Docs/tools.html#module-tools)
 
+- Two scripts, [AL_SAM](https://cyvernes.github.io/AL_Docs/AL_SAM.html#module-AL_SAM) and [run_model](https://cyvernes.github.io/AL_Docs/run_model.html#module-run_model) are available to start experiments easily.
 ## How to use the pipeline ?
 ### With AL_SAM
+AL_SAM is a script made to run experiments on single images, results are not aggregated. At the beginning of the script some parameters have to be selected. 
+- Learners parameters: They define the learning strategy to test. One can choose the type of the learner and every other parameters
 
+- Budget parameters: They define the maximum number of annotation authorized for every image. If USE_BUDGET is set to False, the budget would be the number of seeds computed by the first sampling strategy.
+
+- Plots and results parameters: They define which visualization should be displayed throughout the experiment.
+
+- Data parameters: They define the dataset on which the experiment is run. 
 
 ### With run_model
 

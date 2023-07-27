@@ -35,8 +35,9 @@ SEED_SELECTION_STRATEGIES = [
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH  # {uncertaintyH, uncertaintyKL}
 FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard, HybridGDFKS_Dist}
 FILTERING_AUX_FUNCTION = NotInMasksFromSegmentationStrategy  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromSegmentationStrategy}
-
 USE_PREVIOUS_LOGITS = False  # change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
+
+# Budget parameters
 USE_BUDGET = True
 ANNOTATION_BUDGET = 80
 
@@ -49,30 +50,30 @@ SAVE_UNCERTAINTY_PERCENTILES = True
 SAVE_AGGREGATED_RESULTS = False
 
 # Data parameters
-SUBSET_SIZE = 1
-TRAIN_RATIO = 1
-LOAD_DATA_ONCE_FOR_ALL = True
-CHOOSE_DATA_AT_RANDOM = False
-LOAD_ONE_IMAGE_IN_EACH_FOLDER = False
+SUBSET_SIZE = 1 # Number of images to 
+TRAIN_RATIO = 1 # Allways set to 1 if there is no testing procedure
+LOAD_DATA_ONCE_FOR_ALL = True # Load all images on the memory to reduce loading time
+CHOOSE_DATA_AT_RANDOM = False # If set to True SUBSET_SIZE images are chosen from the dataset
+LOAD_ONE_IMAGE_IN_EACH_FOLDER = False # If the dataset is splitted on different folders
 FILE_WITH_ALL_LINKS = (
     "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
-)
-FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/"
-FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/"
+) # JSON file that contains every link of every image on the dataset.
+FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/" # Folder in xhich intermediate results are saved.
+FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/" # Folder in which final results are saved.
 SPECIFIC_IMAGE_LINKS = [
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/images/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/images/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/images/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/images/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
-]
+] # if CHOOSE_DATA_AT_RANDOM is set to False, images are loaded from these links.
 SPECIFIC_MASK_LINKS = [
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/masks/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/masks/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/masks/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/masks/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/masks/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
-]
+]  # if CHOOSE_DATA_AT_RANDOM is set to False, masks are loaded from these links.
 SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[0]]
 SPECIFIC_MASK_LINKS = [SPECIFIC_MASK_LINKS[0]]
 
