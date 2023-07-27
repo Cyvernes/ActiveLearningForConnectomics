@@ -1,5 +1,6 @@
 # Active Learning For Connectomics
 
+This project aims to use Active Learning procedures on the [SAM model](https://github.com/facebookresearch/segment-anything) to perform mitochondrial segmentation with point annotation.
 
 ## Instalation
 
@@ -23,6 +24,11 @@ SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnecto
 
 ## Description of the pipeline
 
+This project implements a flexible pipeline to code easily any active learning strategy for segmentation.The pipeline contains a number of modules that can be used to code a large number of different strategies.
+
+- 4 Learner types are available: 
+-- test
+
 ## How to use the pipeline ?
 ### With AL_SAM
 
@@ -31,4 +37,8 @@ SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnecto
 
 
 ## Contributors
+
+This project was made possible with the help of many contributors:
+
+Clément Yvernes, Donglai Wei, Junsik Kim and Yifan (Rosetta) Hu.
 
