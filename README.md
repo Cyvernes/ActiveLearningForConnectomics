@@ -21,13 +21,14 @@ git clone git@github.com:Cyvernes/ActiveLearningForConnectomics.git
 
 SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnectomics.git) to work properly. This project have been devellopped with the ViT-H SAM model, you can use this [link](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth) to download it.
 
-##Description of the pipeline
+## Description of the pipeline
 
 ## How to use the pipeline ?
 ### With AL_SAM
 
-###With run_model
+
+### With run_model
 
 
-##Contributors
+## Contributors
 
