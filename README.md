@@ -27,7 +27,7 @@ SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnecto
 This project implements a flexible pipeline to code easily any active learning strategy for segmentation.The pipeline contains a number of modules that can be used to code a large number of different strategies.
 
 - 4 Learner types are available: 
--- test
+    - test
 
 ## How to use the pipeline ?
 ### With AL_SAM
