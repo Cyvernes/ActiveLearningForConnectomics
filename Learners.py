@@ -231,8 +231,9 @@ class FPFNLearner(ActiveLearningSAM):
         self,
         model,
         strategy_selector,
-        learning_strategies,
-        seeds_selection_strategies,
+        learning_strategies : list,
+        first_seeds_selector,
+        seeds_selection_strategies : list,
         uncertainty_fn,
         filtering_fn,
         filtering_aux_fn,
@@ -267,15 +268,16 @@ class FPFNLearner(ActiveLearningSAM):
         """
         super().__init__(
             model,
-            strategy_selector=None,
-            learning_strategies=[],
+            strategy_selector=strategy_selector,
+            learning_strategies=learning_strategies,
+            first_seeds_selector=first_seeds_selector,
             seeds_selection_strategies=[],
-            uncertainty_fn=None,
-            filtering_fn=None,
-            filtering_aux_fn=None,
+            uncertainty_fn=uncertainty_fn,
+            filtering_fn=filtering_fn,
+            filtering_aux_fn=filtering_aux_fn,
             image=image,
-            mask_generator=mask_decorator,
-            use_previous_logits=False,
+            mask_generator=mask_generator,
+            use_previous_logits=use_previous_logits,
         )
         self.GT_mask = None
         self.need_ground_truth = True
@@ -296,7 +298,7 @@ class FPFNLearner(ActiveLearningSAM):
         The selected seed aims to target regions with higher segmentation errors for further annotation
         and improvement.
 
-        :return: Next seed to annotate (in a list)
+        :return: Next seed to annotate (in a list).
         :rtype: list
         """
         error = np.bitwise_xor(self.GT_mask, self.cp_mask)
@@ -312,8 +314,9 @@ class RandomLearner(ActiveLearningSAM):
         self,
         model,
         strategy_selector,
-        learning_strategies,
-        seeds_selection_strategies,
+        learning_strategies : list,
+        first_seeds_selector,
+        seeds_selection_strategies : list,
         uncertainty_fn,
         filtering_fn,
         filtering_aux_fn,
@@ -348,15 +351,16 @@ class RandomLearner(ActiveLearningSAM):
         """
         super().__init__(
             model,
-            strategy_selector=None,
-            learning_strategies=[],
+            strategy_selector=strategy_selector,
+            learning_strategies=learning_strategies,
+            first_seeds_selector=first_seeds_selector,
             seeds_selection_strategies=[],
-            uncertainty_fn=None,
-            filtering_fn=None,
-            filtering_aux_fn=None,
+            uncertainty_fn=uncertainty_fn,
+            filtering_fn=filtering_fn,
+            filtering_aux_fn=filtering_aux_fn,
             image=image,
             mask_generator=mask_generator,
-            use_previous_logits = False,
+            use_previous_logits=use_previous_logits,
         )
         random.seed(0)  # Select the seed for the pseudo-random generator to ensure reproducibility.
 
@@ -367,7 +371,7 @@ class RandomLearner(ActiveLearningSAM):
         pixel coordinates within the image's dimensions. The selection is independent of
         segmentation performance or active learning strategies.
         
-        :return: Next seed to annotate (in a list)
+        :return: Next seed to annotate (in a list).
         :rtype: list
         """
         h, w, _ = self.image.shape
@@ -396,28 +400,28 @@ class PseudoActiveLearningSAM(ActiveLearningSAM):
     ) -> None:
         """Constructor of the ActiveLearningSAM class
 
-        :param model: Model used in segmentation (usually it's SAM)
+        :param model: Model used in segmentation (usually it's SAM).
         :type model: _type_
-        :param strategy_selector: Function that selects wich strategy will be used
+        :param strategy_selector: Function that selects wich strategy will be used.
         :type strategy_selector: _type_
-        :param learning_strategies: Every learning strategies that will be used during the experiment
-        :type learning_strategies: _type_
-        :param first_seeds_selector: Function that selects the first points to annotate
+        :param learning_strategies: List of learning strategies to be used during the experiment.
+        :type learning_strategies: list
+        :param first_seeds_selector: Function that selects the first points to annotate.
         :type first_seeds_selector: _type_
-        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment
-        :type seeds_selection_strategies: _type_
-        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map
+        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.
+        :type seeds_selection_strategies: list
+        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.
         :type uncertainty_fn: _type_
-        :param filtering_fn: Function used as a filter during sampling of the next seeds
+        :param filtering_fn: Function used as a filter during the sampling of the next seeds.
         :type filtering_fn: _type_
-        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter
+        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.
         :type filtering_aux_fn: _type_
-        :param image: Image to segment, defaults to None
-        :type image: _type_, optional
-        :param mask_generator: Automatic mask generator, defaults to None
+        :param image: Image to segment, defaults to None.
+        :type image: np.ndarray, optional
+        :param mask_generator: Automatic mask generator, defaults to None.
         :type mask_generator: _type_, optional
-        :param use_previous_logits: _description_, defaults to True
-        :type use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, optional
+        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.
+        :type use_previous_logits: bool, optional
         """
         super().__init__(
             model,
