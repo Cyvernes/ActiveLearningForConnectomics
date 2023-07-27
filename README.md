@@ -44,6 +44,8 @@ This project implements a flexible pipeline to code easily any active learning s
 
 - Some [strategy selectors](https://cyvernes.github.io/AL_Docs/strategy_selectors.html#module-strategy_selectors) are available. These function computes which learning or sampling strategy should be used at each moment of the learning procedure. Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/strategy_selectors.html) to have a description of all strategy selectors natively available.
 
+- Many tools are available. They are used by every module of the pipeline. They provide [data tools](https://cyvernes.github.io/AL_Docs/data_tools.html#module-data_tools), [Visualisation tools](https://cyvernes.github.io/AL_Docs/plot_tools.html#module-plot_tools) and [miscellaneous tools](https://cyvernes.github.io/AL_Docs/tools.html#module-tools)
+
 ## How to use the pipeline ?
 ### With AL_SAM
 
@@ -53,7 +55,7 @@ This project implements a flexible pipeline to code easily any active learning s
 
 ## Contributors
 
-This project was made possible with the help of many contributors:
+This project was made possible with the help of many contributors. They are listed in alphabetical order:
 
 Clément Yvernes, Donglai Wei, Junsik Kim and Yifan (Rosetta) Hu.
 
