@@ -27,7 +27,10 @@ SAM needs a [model checkpoint](git@github.com:Cyvernes/ActiveLearningForConnecto
 This project implements a flexible pipeline to code easily any active learning strategy for segmentation.The pipeline contains a number of modules that can be used to code a large number of different strategies.
 
 - 4 Learner types are available: 
-    - test
+    - ActiveLearningSAM: This is the fundamental class for the active Learning for Connectomics project. This class should be used for every active learner that need not access ground truth.
+    - PseudoActiveLearningSAM: This class is an active learner that can access the ground truth. It allows simulating specific settings that need to use the ground truth. For instance, providing all foreground points at the beginning can only be done in this class.
+    - FPFNLearner: This class is not an active learner, it has been implemented to compare active learners to other type of learners. In this class, sampling is based on false positive and false negative pixels.
+    - RandomLearner: This class is not an active learner, it has been implemented to compare active learners to other type of learners. In this class, sampling is done randomly. 
 
 ## How to use the pipeline ?
 ### With AL_SAM
