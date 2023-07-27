@@ -44,6 +44,8 @@ This project implements a flexible pipeline to code easily any active learning s
 
 - Some [strategy selectors](https://cyvernes.github.io/AL_Docs/strategy_selectors.html#module-strategy_selectors) are available. These function computes which learning or sampling strategy should be used at each moment of the learning procedure. Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/strategy_selectors.html) to have a description of all strategy selectors natively available.
 
+- Some [strategies to sample the first seeds](https://cyvernes.github.io/AL_Docs/first_seeds_selector.html#module-first_seeds_selector) are available. They decide which points should be annotated in first. Please note that some of these strategies can be used to similate specific setting, they might require to access the ground truth. In this case, PseudoActiveLearningSAM should be used instead of ActiveLearningSAM.
+
 - Many tools are available. They are used by every module of the pipeline. They provide [data tools](https://cyvernes.github.io/AL_Docs/data_tools.html#module-data_tools), [Visualisation tools](https://cyvernes.github.io/AL_Docs/plot_tools.html#module-plot_tools) and [miscellaneous tools](https://cyvernes.github.io/AL_Docs/tools.html#module-tools)
 
 ## How to use the pipeline ?
