@@ -18,12 +18,10 @@ To begin with, clone the repository to your local machine:
 git clone https://github.com/Cyvernes/ActiveLearningForConnectomics.git
 ```
 
-After activating the environment, navigate to the project directory and install the necessary packages:
-
 You can try to install necessary packages with the requirements.txt
 
 ```
-cd ActiveLearningForConnectomics
+cd path\to\ActiveLearningForConnectomics
 pip install -r requirements.txt
 ```
 If these requirements does not work on your machine, please follow the instalation procedure of the [official SAM Repository](https://github.com/facebookresearch/segment-anything#installation)
