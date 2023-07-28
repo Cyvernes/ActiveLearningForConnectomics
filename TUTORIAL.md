@@ -4,7 +4,7 @@
 
 This project implements a flexible pipeline to easily code many active learning strategies for segmentation. It contains a large number of modules that allow you to code a very large number of learning strategies. Each strategy is built by assembling elements of each module. It is therefore necessary to understand the interest of each module.This paragraph provides a short description of each module. Should further details be required, [documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation) is available.
 
-- Four [Learners](https://cyvernes.github.io/AL_Docs/Learners.html#module-Learners) are available: 
+- Four [Learners](https://cyvernes.github.io/AL_Docs/Learners.html#module-Learners) are available. Learners are the main classes in the pipeline, they contain all the methods called during an active learning process: 
     - ActiveLearningSAM: This is the fundamental class for the active Learning for Connectomics project. This class should be used for every active learner that need not access ground truth.
 
     - PseudoActiveLearningSAM: This class is an active learner that can access the ground truth. It allows simulating specific settings that need to use the ground truth. For instance, providing all foreground points at the beginning can only be done in this class.
@@ -13,7 +13,7 @@ This project implements a flexible pipeline to easily code many active learning 
 
     - RandomLearner: This class is not an active learner, it has been implemented to compare active learners to other type of learners. In this class, sampling is done randomly. 
     
-- Many [learning strategies](https://cyvernes.github.io/AL_Docs/learning_strategies.html#module-learning_strategies) are available. Each learning strategy implements a segmentation stratey, an uncertainty strategy and a final_prediction strategy. They update the Learner’s evidence map and current predicted masks using corresponding strategies. Each Learning strategy is made of three components:
+- Many [learning strategies](https://cyvernes.github.io/AL_Docs/learning_strategies.html#module-learning_strategies) are available. Learning strategies update their Learner’s evidence map and current predicted mask. The learning strategies are divided into three distinct sub-strategies:
     - A segmentation strategy that aims to have the best possible segmentation for already annotated objects.
     - An uncertainty strategy that aims to use every annotated points to estimate region of uncertainty and the evidence map (logits).
     - The final prediction strategy that uses the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.
