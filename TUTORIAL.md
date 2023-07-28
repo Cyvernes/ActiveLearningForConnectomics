@@ -2,7 +2,7 @@
 
 ## Description of the pipeline
 
-This project implements a flexible pipeline to easily code many active learning strategies for segmentation. It contains a large number of modules that allow you to code a very large number of learning strategies. Each strategy is built by assembling elements of each module. It is therefore necessary to understand the interest of each module.This paragraph provides a short description of each module. Should further details be required, [documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation) is available.
+This project implements a flexible pipeline to easily code many active learning strategies for segmentation. It contains a large number of modules that allow you to code a very large number of learning strategies. Each strategy is built by assembling elements of each module. It is therefore necessary to understand the interest of each module. This paragraph provides a short description of each module. Should further details be required, [more documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation) is available.
 
 - Four [Learners](https://cyvernes.github.io/AL_Docs/Learners.html#module-Learners) are available. Learners are the main classes in the pipeline, they contain all the methods called during an active learning process: 
     - ActiveLearningSAM: This is the fundamental class for the active Learning for Connectomics project. This class should be used for every active learner that need not access ground truth.

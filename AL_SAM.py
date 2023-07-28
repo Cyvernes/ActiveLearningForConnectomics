@@ -20,7 +20,11 @@ from learning_strategies import *
 from first_seeds_selector import *
 from data_tools import *
 
-
+####################################################################
+#                                                                  #
+#                   MODIFY CONFIGURATION HERE                      #
+#                                                                  #
+####################################################################
 
 # Learner parameters
 LEARNER_TYPE = "Random"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
