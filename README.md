@@ -8,8 +8,8 @@ This project applies Active Learning procedures to the [SAM model](https://githu
 We strongly recommend creating a separate conda environment:
 
 ```
-conda create -n env python=3.10
-conda activate env
+conda create -n <environment_name> python=3.10
+conda activate <environment_name>
 ```
 
 To begin with, clone the repository to your local machine:
