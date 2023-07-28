@@ -50,15 +50,15 @@ SAVE_UNCERTAINTY_PERCENTILES = True
 SAVE_AGGREGATED_RESULTS = False
 
 # Data parameters
-SUBSET_SIZE = 1 # Number of images to 
-TRAIN_RATIO = 1 # Allways set to 1 if there is no testing procedure
+SUBSET_SIZE = 1 # Number of images to select in the dataset
+TRAIN_RATIO = 1 # Allways set to 1 if there is no testing procedure(currently there is no training on multiple images so no testing)
 LOAD_DATA_ONCE_FOR_ALL = True # Load all images on the memory to reduce loading time
-CHOOSE_DATA_AT_RANDOM = False # If set to True SUBSET_SIZE images are chosen from the dataset
+CHOOSE_DATA_AT_RANDOM = False # If set to True SUBSET_SIZE images are chosen from the dataset, otherwise images are selected in SPECIFIC_IMAGE_LINKS
 LOAD_ONE_IMAGE_IN_EACH_FOLDER = False # If the dataset is splitted on different folders
 FILE_WITH_ALL_LINKS = (
     "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
 ) # JSON file that contains every link of every image on the dataset.
-FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/" # Folder in xhich intermediate results are saved.
+FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/" # Folder in which intermediate results are saved.
 FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/" # Folder in which final results are saved.
 SPECIFIC_IMAGE_LINKS = [
     "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",

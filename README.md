@@ -31,26 +31,13 @@ Please follow the instructions provided by the [official SAM Repo](https://githu
 Download the [ViT-H](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth) SAM model checkpoint
 
 ## Getting Started
-### For Single Image
-Begin by running the following command:
-```
-python AL_SAM.py
-```
-You will need to modify the following parameters located at the top of the AL_SAM.py script:
-- Learner parameters: Select your preferred learning strategy and learner type.
-- Budget parameters: Determine your maximum annotations per image (or use the first sampling strategy by setting USE_BUDGET to False).
-- Plots and results parameters: Choose the visualizations to be displayed during the experiment.
-- Data parameters: Identify the dataset for your experiment.
 
-### For Dataset
-To achieve aggregated results on a single dataset, modify necessary parameters in the config file and run: 
-```
-python run_model.py <config_path>
-```
+To get started with the pipeline, please follow the [tutorial](https://github.com/Cyvernes/ActiveLearningForConnectomics/blob/main/TUTORIAL.md)
+
 
 ## Pipeline Features
 
-The project offers a flexible pipeline for coding various active learning strategies for segmentation. You can find more details in the [documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation).
+The project offers a flexible pipeline for coding various active learning strategies for segmentation. You can find more details in the [tutorial](https://github.com/Cyvernes/ActiveLearningForConnectomics/blob/main/TUTORIAL.md) or in the [documentation](https://cyvernes.github.io/AL_Docs/index.html#welcome-to-active-learning-for-connectomics-s-documentation).
 
 Key components of the pipeline include:
 

@@ -17,7 +17,7 @@ This project implements a flexible pipeline to easily code many active learning 
     - A segmentation strategy that aims to have the best possible segmentation for already annotated objects.
     - An uncertainty strategy that aims to use every annotated points to estimate region of uncertainty and the evidence map (logits).
     - The final prediction strategy that uses the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.
-PLease refer to the [documentation](https://cyvernes.github.io/AL_Docs/learning_strategies.html#module-learning_strategies) to have a description of all learning strategies natively available.
+Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/learning_strategies.html#module-learning_strategies) to have a description of all learning strategies natively available.
 
 - Some [sampling strategies](https://cyvernes.github.io/AL_Docs/next_seeds_strategies.html#module-next_seeds_strategies) are available. Sampling strategies use the evidence map or the uncertainty map to sample the next points to annotate. Please refer to the [documentation](https://cyvernes.github.io/AL_Docs/next_seeds_strategies.html#module-next_seeds_strategies) to have a description of all sampling strategies natively available.
 
@@ -36,5 +36,24 @@ PLease refer to the [documentation](https://cyvernes.github.io/AL_Docs/learning_
 
 ### For Single Image
 
-To quickly launch an experiment on a single image, it is recommended to use AL_SAM. It is possible to use AL_SAM to run experiments on a dataset but the results will not be aggregated. That's why it's recommended to use run_model to run experiments on a dataset.
+To quickly launch an experiment on a single image, it is recommended to use AL_SAM. It is possible to use AL_SAM to run experiments on a dataset but the results will not be aggregated. That is why it is recommended to use run_model to run experiments on a dataset.
 
+To use AL_SAM, you will need to modify the following parameters located at the top of the AL_SAM.py script:
+- Learner parameters: Select your preferred learning strategy and learner type.
+- Budget parameters: Determine your maximum annotations per image (or use the first sampling strategy by setting USE_BUDGET to False).
+- Plots and results parameters: Choose the visualizations to be displayed during the experiment.
+- Data parameters: Identify the dataset for your experiment.
+
+If you want to use your own function, you only need to import it on the script and place it at the corresponding parameter.
+
+Once all the parameters are chosen, just run the script.
+
+```
+python AL_SAM.py
+```
+
+### For Dataset
+To achieve aggregated results on a single dataset, modify necessary parameters in the config file and run: 
+```
+python run_model.py <config_path>
+```
