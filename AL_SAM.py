@@ -37,6 +37,10 @@ FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterW
 FILTERING_AUX_FUNCTION = NotInMasksFromSegmentationStrategy  # {evidenceSmallerOrEqualToZero, threshOnUncertainty, NotInMasksFromSegmentationStrategy}
 USE_PREVIOUS_LOGITS = False  # change how Learning strategies use previous logits (only change basicLS now) (may be deprecated in the future)
 
+# SAM checkpoint
+SAM_CHECKPOINT = "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
+SAM_TYPE = "vit_h"
+
 # Budget parameters
 USE_BUDGET = True
 ANNOTATION_BUDGET = 80
@@ -142,11 +146,7 @@ if __name__ == "__main__":
     print("Loading the model...")
 
     # Loading model weights
-    sam_checkpoint = (
-        "/n/home12/cyvernes/working_directory/SAM_checkpoints/sam_vit_h_4b8939.pth"
-    )
-    model_type = "vit_h"
-    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    sam = sam_model_registry[SAM_TYPE](checkpoint=SAM_CHECKPOINT)
     sam.to(device=device)
 
     """
