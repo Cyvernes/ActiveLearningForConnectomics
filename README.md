@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ```
 If these requirements does not work on your machine, please follow the installation procedure of the [official SAM Repository](https://github.com/facebookresearch/segment-anything#installation). We recommend using python3.10.
 
-This project uses SAM and our experiments have been done with the [ViT-H](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth) SAM model checkpoint. It is recomended to use this checkpoint. Should your machine not able to load the checkpoint, other checkpoints are available on the [official SAM Repository](https://github.com/facebookresearch/segment-anything#model-checkpoints).
+This project uses SAM and our experiments have been done with the [ViT-H](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth) SAM model checkpoint. It is recomended to use this checkpoint. Should your machine not be able to load the checkpoint, other checkpoints are available on the [official SAM Repository](https://github.com/facebookresearch/segment-anything#model-checkpoints).
 
 ## Getting Started
 
