@@ -7,15 +7,19 @@ from Learners import ActiveLearningSAM
 
 class BasicLS:
     """This class is the basic class for all learning strategy.
-    Update the Learner’s evidence map and current predicted masks by corresponding strategies
-    Each learning strategy implements a segmentation stratey, an uncertainty strategy and a final_prediction strategy.
+    Each learning strategy implements a segmentation strategy, an uncertainty strategy and a final_prediction strategy.
+    It updates the Learner’s evidence map and current predicted masks using corresponding strategies.
+    
     The segmentation strategy aims to have the best possible segmentation for already annotated objects.
-    The uncertainty strategy aims to use every annotated points to estimate region of high uncertainty.
-    The final prediction strategy use the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.
+    
+    The uncertainty strategy aims to use every annotated points to estimate region of uncertainty and the evidence map (logits).
+    
+    The final prediction strategy uses the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.
     
     """
     def __init__(self, learner : ActiveLearningSAM) -> None:
-        """Constructor of the class
+    
+        """Constructor of the class.
 
         :param learner: Learner
         :type learner: ActiveLearningSAM

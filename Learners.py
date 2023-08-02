@@ -307,7 +307,7 @@ class FPFNLearner(ActiveLearningSAM):
  
 
 class RandomLearner(ActiveLearningSAM):
-    """This class is not an active learner<;
+    """This class is not an active learner.
     Seeds are chosen randomly without employing active learning strategies.
     """
     def __init__(
