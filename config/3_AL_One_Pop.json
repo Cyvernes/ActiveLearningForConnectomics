@@ -1,0 +1,7 @@
+{
+  "learner_parameters": {
+    "LEARNER_TYPE": "Active Learning",
+    "FIRST_SEEDS_SELECTOR": "popLastSESeeds",
+    "LEARNING_STRATEGIES": ["OneSeedForOneMaskLS"]
+  }
+}

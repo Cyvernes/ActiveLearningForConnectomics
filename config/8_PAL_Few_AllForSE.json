@@ -1,0 +1,7 @@
+{
+  "learner_parameters": {
+    "LEARNER_TYPE": "Pseudo Active Learning",
+    "LEARNING_STRATEGIES": ["FewSeedsForOneMaskLS"],
+    "FIRST_SEEDS_SELECTOR": "allForegroundSESeeds"    
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "learner_parameters": {
+    "LEARNER_TYPE": "FPFN",
+    "FIRST_SEEDS_SELECTOR": "allSESeeds"
+  },
+  "plot_parameters": {
+    "SAVE_FIRST_SEED": false,
+    "SAVE_FINAL_RESULT": false
+  }
+}

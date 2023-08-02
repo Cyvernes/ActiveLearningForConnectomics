@@ -1,0 +1,8 @@
+{
+  "learner_parameters": {
+    "LEARNER_TYPE": "Active Learning",
+    "FIRST_SEEDS_SELECTOR": "allSESeeds",
+    "LEARNING_STRATEGIES": ["FewSeedsForOneMaskLS"]
+  }
+  
+}

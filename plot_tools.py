@@ -413,6 +413,7 @@ def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
     IoUs = aggregated_results["images_max_IoUs"]
     FPs = aggregated_results["images_FPs_at_max_IoU"]
     FNs = aggregated_results["images_FNs_at_max_IoU"]
+    DLs = aggregated_results["images_DLs_at_max_IoU"]
     final_nb_seeds = aggregated_results["images_nb_seeds"]
 
     # Plot IoUs
@@ -427,20 +428,21 @@ def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
     axs[0, 1].set_xlabel("FP")
     axs[0, 1].set_ylabel("Frequency")
 
-    # Plot FNs
-    axs[1, 0].hist(FNs, bins=10, edgecolor="black")
-    axs[1, 0].set_title("Distribution of FNs")
-    axs[1, 0].set_xlabel("FN")
+    # Plot DLs
+    axs[1, 0].hist(DLs, bins=10, edgecolor="black")
+    axs[1, 0].set_title("Distribution of DLs")
+    axs[1, 0].set_xlabel("DL")
     axs[1, 0].set_ylabel("Frequency")
 
-    # Plot nb_seeds
-    axs[1, 1].hist(final_nb_seeds, bins=10, edgecolor="black")
-    axs[1, 1].set_title("Distribution of NB Seeds")
-    axs[1, 1].set_xlabel("NB Seeds")
+    # Plot FNs
+    axs[1, 1].hist(FNs, bins=10, edgecolor="black")
+    axs[1, 1].set_title("Distribution of FNs")
+    axs[1, 1].set_xlabel("FN")
     axs[1, 1].set_ylabel("Frequency")
 
     # Add spacing between plots
     plt.tight_layout()
     current_datetime = str(datetime.now().strftime("%m:%d:%H:%M:%S"))
+    print(current_datetime)
     plt.savefig(os.path.join(folder, f"Final Results {current_datetime}.png"))
     plt.clf()

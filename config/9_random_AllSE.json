@@ -1,0 +1,6 @@
+{
+  "learner_parameters": {
+    "LEARNER_TYPE": "Random",
+    "FIRST_SEEDS_SELECTOR": "allSESeeds"
+  }
+}

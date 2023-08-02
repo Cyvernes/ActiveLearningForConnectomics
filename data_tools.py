@@ -5,7 +5,6 @@ import glob
 import random
 from typing import Dict, Tuple, List, Any
 
-random.seed(42)
 
 def retrieveLinksForFolder(config: Dict[str, Any]) -> Tuple[List[str], List[str]]:
     """This function retrieves the links for all images and their corresponding masks 
@@ -16,6 +15,8 @@ def retrieveLinksForFolder(config: Dict[str, Any]) -> Tuple[List[str], List[str]
     :return: Lists of image and mask filepaths
     :rtype: Tuple[List[str], List[str]]
     """
+    random.seed(42)
+    
     images_links = []
     masks_links = []
 
@@ -34,7 +35,6 @@ def retrieveLinksForFolder(config: Dict[str, Any]) -> Tuple[List[str], List[str]
         combined = list(zip(img_files, mask_files))
         combined_sample = random.sample(combined, config["NUMBER_OF_IMAGES"]) # Randomly sample images
         images_links, masks_links = zip(*combined_sample)
-
     return images_links, masks_links
 
 

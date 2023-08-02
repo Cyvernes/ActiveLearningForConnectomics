@@ -73,6 +73,7 @@ def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[i
     :rtype: List[Tuple[int, int]]
     """
     amount = 4
+    print("Amount =", amount)
     assert (
         learner.need_ground_truth
     ), "Learner does not have access to Ground Truth, maybe you should use the PseudoActiveLearningSAM class instead"

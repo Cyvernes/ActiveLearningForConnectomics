@@ -164,10 +164,14 @@ def run_learning_process(learner: ActiveLearningSAM, GT_mask: np.ndarray, first_
     """
     input_points = []
     input_labels = []
-    IoUs = []
-    FPs = []
-    FNs = []
     NBs = []
+    metrics = {
+        "IoUs": IoU,
+        "FPs": FP,
+        "FNs": FN,
+        "DLs": DiceLoss
+    }
+    result = {name: [] for name in metrics.keys()}
     percentiles_points = list(range(0, 100, 5))
     percentiles = [[] for i in percentiles_points]
     next_seeds = first_seeds.copy()
@@ -180,9 +184,8 @@ def run_learning_process(learner: ActiveLearningSAM, GT_mask: np.ndarray, first_
         nb_annotations += len(next_seeds)
         learner.learn(input_points, input_labels)
         NBs.append(len(input_points))
-        IoUs.append(IoU(learner.cp_mask, GT_mask))
-        FPs.append(FP(learner.cp_mask, GT_mask))
-        FNs.append(FN(learner.cp_mask, GT_mask))
+        for name, metric in metrics.items():
+            result[name].append(metric(learner.cp_mask, GT_mask))
         if nb_annotations < budget:
             next_seeds = learner.findNextSeeds()
         else:
@@ -190,15 +193,18 @@ def run_learning_process(learner: ActiveLearningSAM, GT_mask: np.ndarray, first_
         count += 1
         if config["plot_parameters"]["SAVE_INTERMEDIATE_RESULTS"]:
             plotAndSaveIntermediateResults(config["plot_parameters"]["FOLDER_FOR_INTERMEDIATE_RESULTS"], learner,
-                                           next_seeds, image, GT_mask, IoUs, FNs, FPs, count, idx, NBs)
+                                           next_seeds, image, GT_mask, result["IoUs"], result["FNs"], result["FPs"],
+                                           count, idx, NBs)
         if nb_annotations == budget - 1 and config["plot_parameters"]["SAVE_FINAL_RESULT"]:
-            print("True")
             plotAndSaveIntermediateResults(config["plot_parameters"]["FOLDER_FOR_INTERMEDIATE_RESULTS"], learner,
-                                           next_seeds, image, GT_mask, IoUs, FNs, FPs, count, idx, NBs)
+                                           next_seeds, image, GT_mask, result["IoUs"], result["FNs"], result["FPs"],
+                                           count, idx, NBs)
         if config["plot_parameters"]["SAVE_UNCERTAINTY_PERCENTILES"]:
             savePercentiles(learner, percentiles_points, percentiles)
-
-    return {"NBs": NBs, "IoUs": IoUs, "FPs": FPs, "FNs": FNs, "percentiles": percentiles}
+    
+    result["percentiles"] = percentiles
+    result["NBs"] = NBs
+    return result
 
 
 
@@ -259,6 +265,7 @@ def run_model_single_image(learner: ActiveLearningSAM, image_link: str, mask_lin
         aggregated_results['images_max_IoUs'].append(result['IoUs'][max_IoU_index])
         aggregated_results['images_FPs_at_max_IoU'].append(result['FPs'][max_IoU_index])
         aggregated_results['images_FNs_at_max_IoU'].append(result['FNs'][max_IoU_index])
+        aggregated_results['images_DLs_at_max_IoU'].append(result['DLs'][max_IoU_index])
         aggregated_results['images_nb_seeds'].append(nb_seeds)
         aggregated_results['images_max_IoUs_index'].append(max_IoU_index)
         print(max_IoU_index)
@@ -281,7 +288,7 @@ def run_model_dataset(learner: ActiveLearningSAM, images_links: List[str], masks
     aggregated_results = {}
     if config["plot_parameters"]["SAVE_AGGREGATED_RESULTS"]:
         aggregated_results = {'images_max_IoUs': [], 'images_FPs_at_max_IoU': [], 'images_FNs_at_max_IoU': [],
-                              'images_percentiles': [], 'images_nb_seeds': [], 'images_max_IoUs_index': []}
+                              'images_DLs_at_max_IoU': [], 'images_percentiles': [],  'images_nb_seeds': [], 'images_max_IoUs_index': []}
     total_number_images = int(config["training_parameters"]["TRAIN_RATIO"] * len(images_links))
     for idx in range(total_number_images):
         print("-------------------------------------", idx + 1, "/", total_number_images)
@@ -296,8 +303,13 @@ def run_model_dataset(learner: ActiveLearningSAM, images_links: List[str], masks
 if __name__ == "__main__":
     """Main function of the pipeline to run on dataset
     """
+    if len(sys.argv) > 1:
+        override_config_path = sys.argv[1]
+    else:
+        override_config_path = "./config/base_config.json"
+    
     print("Print")
-    config = load_config("./config/base_config.json", "./config/setting_AL2_config_seed.json")
+    config = load_config("./config/base_config.json", override_config_path)
     config["model_parameters"]["DEVICE"] = check_environment()
 
     print("Training")
@@ -305,5 +317,6 @@ if __name__ == "__main__":
     print(config["learner_parameters"])
     print(config["training_parameters"])
     learner = setup_learner(config["learner_parameters"], sam)
+
     images_links, masks_links = retrieveLinksForFolder(config["data_parameters"])
     run_model_dataset(learner, images_links, masks_links, config)

@@ -2,7 +2,7 @@
   "learner_parameters": {
     "LEARNER_TYPE": "Pseudo Active Learning",
     "STRATEGY_SELECTOR": "singleStrat",
-    "LEARNING_STRATEGIES": ["oneSeedForOneMaskLS"],
+    "LEARNING_STRATEGIES": ["OneSeedForOneMaskLS"],
     "FIRST_SEEDS_SELECTOR": "allForegroundSESeeds",
     "SEED_SELECTION_STRATEGIES": ["ArgmaxForegroundProbability"],
     "UNCERTAINTY_FUNCTION_TYPE": "uncertaintyH",
@@ -14,18 +14,18 @@
     "SUBSET_SIZE": 1,
     "TRAIN_RATIO": 1,
     "USE_BUDGET": true,
-    "ANNOTATION_BUDGET": 100
+    "ANNOTATION_BUDGET": 50
   },
   "plot_parameters": {
     "SAVE_INTERMEDIATE_RESULTS": false,
     "SAVE_IMAGE_WITH_GT": false,
-    "SAVE_FIRST_SEED": true,
-    "SAVE_FINAL_RESULT": true,
+    "SAVE_FIRST_SEED": false,
+    "SAVE_FINAL_RESULT": false,
     "SAVE_FINAL_IOU_EVOLUTION": false,
     "SAVE_UNCERTAINTY_PERCENTILES": false,
     "SAVE_AGGREGATED_RESULTS": true,
     "FOLDER_FOR_INTERMEDIATE_RESULTS": "./temp",
-    "FOLDER_FOR_FINAL_RESULTS": "./final results"
+    "FOLDER_FOR_FINAL_RESULTS": "./batch_results"
   },
   "data_parameters":{
     "LOAD_DATA_ONCE_FOR_ALL": true,
@@ -33,7 +33,8 @@
     "LOAD_ONE_IMAGE_IN_EACH_FOLDER": true,
     "FILE_WITH_ALL_LINKS": "./cem_mitolab_dataset_links.json",
     "BASE_DIR": "../../data/cem_mitolab",
-    "IMAGE_FOLDER": "../../data/cem_mitolab/Wei2020_MitoEM-H/"
+    "IMAGE_FOLDER": "../../data/cem_mitolab/Wei2020_MitoEM-H/",
+    "NUMBER_OF_IMAGES": 500
   },
   "model_parameters": {
     "MODEL_WEIGHTS_PATH": "./sam_vit_h_4b8939.pth",

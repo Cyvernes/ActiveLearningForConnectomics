@@ -4,6 +4,10 @@ temp/
 sam_vit_h_4b8939.pth
 .vscode/settings.json
 runscript.sh
+batch_runner_helper.py
 docs/
 batch_output/
-config/
+batch_results/
+batch_txt_results/
+*.err
+*.out
