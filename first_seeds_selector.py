@@ -73,7 +73,6 @@ def aGivenAmountOfForegroundSESeeds(learner : ActiveLearningSAM) -> List[Tuple[i
     :rtype: List[Tuple[int, int]]
     """
     amount = 4
-    print("Amount =", amount)
     assert (
         learner.need_ground_truth
     ), "Learner does not have access to Ground Truth, maybe you should use the PseudoActiveLearningSAM class instead"
@@ -100,6 +99,6 @@ def aGivenAmountOfSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """
     amount = 4
     SE_mask = learner.SE_masks.pop(-1)["segmentation"]
-    first_seeds = learner.SE_Seeds[-min(len(first_seeds), amount):]
-    learner.SE_Seeds = learner.SE_Seeds[0:- min(len(first_seeds), amount)]
+    first_seeds = learner.SE_Seeds[-min(len(learner.SE_Seeds), amount):]
+    learner.SE_Seeds = learner.SE_Seeds[0:- min(len(learner.SE_Seeds), amount)]
     return (first_seeds, SE_mask)
