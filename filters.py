@@ -57,7 +57,7 @@ def threshOnUncertainty(learner : ActiveLearningSAM) -> np.ndarray:
         min_evidence_thresh = np.log(min_p_thresh / (1 - min_p_thresh))
     blob = learner.evidence < max_evidence_thresh
     if min_p_thresh != 0:
-        blob[learner.evidence > min_evidence_thresh] = 0
+        blob[learner.evidence < min_evidence_thresh] = 0
     blob = blob.astype("uint8")
     return blob
 

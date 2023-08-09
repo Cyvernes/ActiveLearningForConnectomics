@@ -27,14 +27,14 @@ from data_tools import *
 ####################################################################
 
 # Learner parameters
-LEARNER_TYPE = "Random"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
+LEARNER_TYPE = "Pseudo Active Learning"  # {"Active Learning", "Pseudo Active Learning", "FPFN", "Random"}
 STRATEGY_SELECTOR = singleStrat  # {singleStrat, changeAtFirstMito, changeAfterASpecificNumberOfSeed, changeAfterASpecificNumberOfSeenMito}
 LEARNING_STRATEGIES = [
     FewSeedsForOneMaskLS
 ]  # {BasicLS, OneSeedForOneMaskLS, OneSeedForOneMaskLSWithDropOut, FewSeedsForOneMaskLS}
-FIRST_SEEDS_SELECTOR = aGivenAmountOfForegroundSESeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning, aGivenAmountOfForegroundSESeeds}
+FIRST_SEEDS_SELECTOR = aGivenAmountOfForegroundSeeds  # {popLastSESeeds, allSESeeds, allForegroundSESeeds /!\ need Pseudo Active Learning, aGivenAmountOfForegroundSESeeds}
 SEED_SELECTION_STRATEGIES = [
-    ArgmaxForegroundProbability
+    ArgmaxUncertainty
 ]  # {ArgmaxEvInSESeeds, ArgmaxUncertainty, ArgmaxUncertaintyPathDist, ArgmaxUncertaintyInSESeeds, ArgmaxEvidence, ArgmaxForegroundProbability}
 UNCERTAINTY_FUNCTION_TYPE = uncertaintyH  # {uncertaintyH, uncertaintyKL}
 FILTERING_FUNCTION = HybridGDFKS_Dist  # {filterTrivial, filterWithDist, filterWithDistWithBorder, filterWithPercentile, filterWithDistSkeleton, hardFilter, filterGaussianDistFromKnownSeeds, HybridGDFKS_hard, HybridGDFKS_Dist}
@@ -47,7 +47,7 @@ SAM_TYPE = "vit_h"
 
 # Budget parameters
 USE_BUDGET = True
-ANNOTATION_BUDGET = 80
+ANNOTATION_BUDGET = 20
 
 # Plots and results parameters
 SAVE_INTERMEDIATE_RESULTS = True
@@ -63,27 +63,16 @@ TRAIN_RATIO = 1 # Allways set to 1 if there is no testing procedure(currently th
 LOAD_DATA_ONCE_FOR_ALL = True # Load all images on the memory to reduce loading time
 CHOOSE_DATA_AT_RANDOM = False # If set to True SUBSET_SIZE images are chosen from the dataset, otherwise images are selected in SPECIFIC_IMAGE_LINKS
 LOAD_ONE_IMAGE_IN_EACH_FOLDER = False # If the dataset is splitted on different folders
-FILE_WITH_ALL_LINKS = (
-    "/n/home12/cyvernes/working_directory/cem_mitolab_dataset_links.json"
-) # JSON file that contains every link of every image on the dataset.
+FILE_WITH_ALL_LINKS = "/n/home12/cyvernes/working_directory/Kidney_HE_glom_capsule_dataset_links.json" # JSON file that contains every link of every image on the dataset.
 FOLDER_FOR_INTERMEDIATE_RESULTS = "working_directory/results/intermediate results/" # Folder in which intermediate results are saved.
 FOLDER_FOR_FINAL_RESULTS = "working_directory/results/final results/" # Folder in which final results are saved.
 SPECIFIC_IMAGE_LINKS = [
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/images/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/images/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/images/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/images/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/images/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
+    "/n/home12/cyvernes/Kidney/pas-gcapsule-data/im_10.png",
 ] # if CHOOSE_DATA_AT_RANDOM is set to False, images are loaded from these links.
 SPECIFIC_MASK_LINKS = [
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-R/masks/Wei2020_MitoEM-R-ROI-x0-500_y0-512_z1536-2048-LOC-0_199_0-512_0-512.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/jrc_ctl-id8-4_openorganelle/masks/jrc_ctl-id8-4_openorganelle-ROI-x229-458_y2466-2690_z3365-3589-LOC-2_70-75_0-224_0-224.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/271N4JXZ0Ux7d61W39t6_3D/masks/271N4JXZ0Ux7d61W39t6_3D-LOC-0_32-37_0-115_0-224.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/Wei2020_MitoEM-H/masks/Wei2020_MitoEM-H-ROI-x0-500_y512-1024_z3072-3584-LOC-0_076_0-512_0-512.tiff",
-    "/n/home12/cyvernes/CEM/CEM-MitoLab/data/cem_mitolab/52f72Bc125o7v94Ep850_2D/masks/52f72Bc125o7v94Ep850_2D_img00607-LOC-2d-1792-2016_448-672.tiff",
+    "/n/home12/cyvernes/Kidney/pas-gcapsule-data/im_10_mask_capsule.png",
 ]  # if CHOOSE_DATA_AT_RANDOM is set to False, masks are loaded from these links.
-SPECIFIC_IMAGE_LINKS = [SPECIFIC_IMAGE_LINKS[0]]
-SPECIFIC_MASK_LINKS = [SPECIFIC_MASK_LINKS[0]]
+
 
 if __name__ == "__main__":
     """
@@ -272,6 +261,7 @@ if __name__ == "__main__":
         nb_annotations = 0
         count = 0
         while nb_annotations < budget:
+            print("Computing result n°", count + 1,"---------")
             learner.count = count + 1
             input_points += next_seeds
             input_labels += [getLabel(new_seed, GT_mask) for new_seed in next_seeds]
@@ -290,7 +280,7 @@ if __name__ == "__main__":
                 next_seeds = []
 
             count += 1
-
+            print("Result n°", count, "has been computed")
             if SAVE_INTERMEDIATE_RESULTS:  # draw count-th prediction
                 plotAndSaveIntermediateResults(
                     FOLDER_FOR_INTERMEDIATE_RESULTS,
@@ -320,6 +310,7 @@ if __name__ == "__main__":
         if SAVE_FINAL_IOU_EVOLUTION:
             plotAndSaveFinalIoUEvolution(FOLDER_FOR_FINAL_RESULTS, NBs, IoUs, idx)
 
+        print("test:", max(IoUs))
         if SAVE_AGGREGATED_RESULTS:
             images_max_IoUs.append(max(IoUs))
             images_FPs_at_max_IoU.append(max(FPs))
