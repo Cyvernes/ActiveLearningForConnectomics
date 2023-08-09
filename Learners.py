@@ -80,7 +80,6 @@ class ActiveLearningSAM:
         self.label_subsets = []  # Used by FewSeedsForOneMask
         self.input_labels = []
         self.evidence = None
-        self.current_strategy_idx = 0
         self.logits = None
         self.a_priori = None
         self.current_strategy_idx = 0
@@ -148,6 +147,7 @@ class ActiveLearningSAM:
         self.a_priori = evidence.squeeze()
         self.masks_from_single_seeds = np.zeros_like(self.a_priori, dtype="int16")
         self.nb_initial_seeds = -1
+        self.nb_seed_used = 0
 
     def findFirstSeeds(self) -> Tuple[List[Tuple[int, int]], int]:
         """Compute the first points to annotate.    
