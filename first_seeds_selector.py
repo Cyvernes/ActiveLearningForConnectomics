@@ -106,6 +106,7 @@ def aGivenAmountOfSESeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
 def aGivenAmountOfForegroundSeeds(learner : ActiveLearningSAM) -> List[Tuple[int, int]]:
     """This function encodes a strategy to find the first point to annotate.
         A specific number of foreground seeds is selected.
+        
         learner.SE_seeds is updated accordingly.
     
     :param learner: Learner
