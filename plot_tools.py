@@ -84,7 +84,7 @@ def plotAndSaveIntermediateResults(
     fig.set_figwidth(23)
 
     prediction_i = image.copy()
-    prediction_i[cp_mask] = 0.7 * image[cp_mask] + 0.3 * np.array([75, 0, 125])
+    prediction_i[cp_mask] = 0.6 * image[cp_mask] + 0.4 * np.array([0, 250, 0])
     axes[0, 0].imshow(prediction_i)
     if next_seeds != []:
         green_seeds = [
@@ -339,7 +339,8 @@ def plotAndSaveImageWithGT(
     """
 
     imagewGT = image.copy()
-    imagewGT[GT_mask] = 0.7 * image[GT_mask] + 0.3 * np.array([75, 0, 125])
+    imagewGT[GT_mask] = 0.7 * image[GT_mask] + 0.3 * np.array([200, 0, 0])
+    print(imagewGT.shape)
     plt.imshow(imagewGT)
     plt.title(f"Image n°{idx} with GT")
     plt.savefig(os.path.join(folder, f"Image n°{idx} with GT.png"))
@@ -398,7 +399,7 @@ def plotAndSave(arr: np.array, name: str):
     plt.clf()
 
 
-def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
+def plotandSaveAggregatedResults(folder: str, aggregated_results: dict, current_datetime=None):
     """This function plots and save the aggreagation of results on the whole dataset
 
     :param folder: Folder in which the figure will be saved
@@ -442,7 +443,8 @@ def plotandSaveAggregatedResults(folder: str, aggregated_results: dict):
 
     # Add spacing between plots
     plt.tight_layout()
-    current_datetime = str(datetime.now().strftime("%m:%d:%H:%M:%S"))
+    if current_datetime is None:
+        current_datetime = str(datetime.now().strftime("%m:%d:%H:%M:%S"))
     print(current_datetime)
     plt.savefig(os.path.join(folder, f"Final Results {current_datetime}.png"))
     plt.clf()
